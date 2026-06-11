@@ -1,0 +1,71 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import Login from './pages/Login';
+import DashboardHome from './pages/DashboardHome';
+import Members from './pages/Members';
+import Trainers from './pages/Trainers';
+import Payments from './pages/Payments';
+import Attendance from './pages/Attendance';
+import Announcements from './pages/Announcements';
+
+// Layout wrapper for all authenticated dashboard pages
+function DashboardLayout() {
+  return (
+    <div className="flex min-h-screen bg-background text-on-surface">
+      {/* Side Navigation panel */}
+      <Sidebar />
+
+      {/* Main Content shell */}
+      <div className="ml-64 flex-grow flex flex-col min-h-screen">
+        {/* Top Header bar */}
+        <Header />
+
+        {/* Content Canvas */}
+        <main className="flex-grow p-gutter md:p-lg">
+          <div className="max-w-[1200px] mx-auto">
+            {/* Child routes get injected here */}
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public Login Route */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected Dashboard Route Layout */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          {/* Root redirect to Dashboard */}
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          
+          {/* Sub-views */}
+          <Route path="dashboard" element={<DashboardHome />} />
+          <Route path="members" element={<Members />} />
+          <Route path="trainers" element={<Trainers />} />
+          <Route path="payments" element={<Payments />} />
+          <Route path="attendance" element={<Attendance />} />
+          <Route path="announcements" element={<Announcements />} />
+        </Route>
+
+        {/* Fallback Catch-all Route */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
