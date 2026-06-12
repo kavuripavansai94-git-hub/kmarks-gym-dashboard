@@ -412,7 +412,7 @@ export default function DashboardHome() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-sm relative z-10">
+              <div className="flex items-center justify-between mt-sm relative z-10 h-[24px]">
                 <SparkBars data={memberWeekData} height={24} />
                 <span className="font-label-bold text-[10px] text-green-500 uppercase flex items-center gap-[2px]">
                   <span className="material-symbols-outlined text-[14px]">trending_up</span>
@@ -435,7 +435,7 @@ export default function DashboardHome() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-sm relative z-10">
+              <div className="flex items-center justify-between mt-sm relative z-10 h-[24px]">
                 <SparkBars data={attendanceWeekData} color="#4ade80" height={24} />
                 <span className="font-label-bold text-[10px] text-on-surface/40 uppercase">
                   {Math.round((activeToday / Math.max(totalMembers, 1)) * 100)}% rate
@@ -466,7 +466,7 @@ export default function DashboardHome() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-sm relative z-10">
+              <div className="flex items-center justify-between mt-sm relative z-10 h-[24px]">
                 <div className="flex gap-[3px]">
                   {[...Array(7)].map((_, i) => (
                     <div key={i} className={`w-[6px] h-[6px] rounded-[1px] ${i < overduePayments ? 'bg-error/80' : 'bg-white/10'}`}></div>
@@ -496,8 +496,8 @@ export default function DashboardHome() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-sm relative z-10">
-                <div className="h-1 flex-grow bg-white/5 mr-md overflow-hidden">
+              <div className="flex items-center justify-between mt-sm relative z-10 h-[24px]">
+                <div className="h-1 flex-grow bg-white/5 mr-md overflow-hidden rounded-full">
                   <div
                     className="h-full bg-gradient-to-r from-yellow-500/60 to-yellow-500 transition-all duration-1000"
                     style={{ width: `${Math.min((expiringSoon / Math.max(totalMembers, 1)) * 100, 100)}%` }}
