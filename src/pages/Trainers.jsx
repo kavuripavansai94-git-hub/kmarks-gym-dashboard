@@ -249,7 +249,10 @@ export default function Trainers() {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-sm lg:gap-gutter">
         <div className="group relative bg-surface-container border border-white/[0.06] p-sm lg:p-md overflow-hidden hover:border-primary-container/30 transition-all">
           <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center justify-between">
+          <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[80px]">groups</span>
+          </div>
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Total Staff</p>
               <p className="font-headline-xl text-[28px] lg:text-[36px] text-white leading-none mt-xs tracking-tighter">
@@ -264,7 +267,10 @@ export default function Trainers() {
 
         <div className="group relative bg-surface-container border border-white/[0.06] p-sm lg:p-md overflow-hidden hover:border-primary-container/30 transition-all">
           <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center justify-between">
+          <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[80px]">assignment_ind</span>
+          </div>
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Members Assigned</p>
               <p className="font-headline-xl text-[28px] lg:text-[36px] text-primary-container leading-none mt-xs tracking-tighter">
@@ -279,7 +285,10 @@ export default function Trainers() {
 
         <div className="group relative bg-surface-container border border-white/[0.06] p-sm lg:p-md overflow-hidden hover:border-primary-container/30 transition-all hidden md:block">
           <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center justify-between">
+          <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[80px]">fitness_center</span>
+          </div>
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Specializations</p>
               <p className="font-headline-xl text-[28px] lg:text-[36px] text-white leading-none mt-xs tracking-tighter">

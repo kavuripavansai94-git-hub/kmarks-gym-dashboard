@@ -400,8 +400,11 @@ export default function DashboardHome() {
             <div className="group relative bg-surface-container border border-white/[0.06] p-md hover:border-primary-container/50 transition-all duration-300 cursor-pointer overflow-hidden"
               onClick={() => navigate('/members')}
             >
+              <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
+                <span className="material-symbols-outlined text-[80px]">group</span>
+              </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-              <div className="flex items-start justify-between mb-sm">
+              <div className="flex items-start justify-between mb-sm relative z-10">
                 <div>
                   <p className="font-label-bold text-[10px] text-on-surface/50 uppercase tracking-[0.15em]">Total Members</p>
                   <p className="font-headline-xl text-[40px] lg:text-[48px] text-white leading-none mt-xs tracking-tighter">
@@ -423,8 +426,11 @@ export default function DashboardHome() {
 
             {/* Active Today */}
             <div className="group relative bg-surface-container border border-white/[0.06] p-md transition-all duration-300 overflow-hidden">
+              <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
+                <span className="material-symbols-outlined text-[80px]">bolt</span>
+              </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-              <div className="flex items-start justify-between mb-sm">
+              <div className="flex items-start justify-between mb-sm relative z-10">
                 <div>
                   <p className="font-label-bold text-[10px] text-on-surface/50 uppercase tracking-[0.15em]">Active Today</p>
                   <p className="font-headline-xl text-[40px] lg:text-[48px] text-white leading-none mt-xs tracking-tighter">
@@ -449,11 +455,14 @@ export default function DashboardHome() {
             }`}
               onClick={() => navigate('/payments')}
             >
+              <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
+                <span className="material-symbols-outlined text-[80px]">warning</span>
+              </div>
               <div className={`absolute top-0 left-0 w-full h-[2px] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${
                 overduePayments > 0 ? 'bg-error' : 'bg-primary-container'
               }`}></div>
               {overduePayments > 0 && <div className="absolute -top-8 -right-8 w-24 h-24 bg-error/5 rounded-full blur-xl"></div>}
-              <div className="flex items-start justify-between mb-sm">
+              <div className="flex items-start justify-between mb-sm relative z-10">
                 <div>
                   <p className="font-label-bold text-[10px] text-on-surface/50 uppercase tracking-[0.15em]">Overdue</p>
                   <p className={`font-headline-xl text-[40px] lg:text-[48px] leading-none mt-xs tracking-tighter ${
@@ -484,8 +493,11 @@ export default function DashboardHome() {
             <div className="group relative bg-surface-container border border-white/[0.06] p-md hover:border-yellow-500/40 transition-all duration-300 cursor-pointer overflow-hidden"
               onClick={() => navigate('/members')}
             >
+              <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
+                <span className="material-symbols-outlined text-[80px]">schedule</span>
+              </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-yellow-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-              <div className="flex items-start justify-between mb-sm">
+              <div className="flex items-start justify-between mb-sm relative z-10">
                 <div>
                   <p className="font-label-bold text-[10px] text-on-surface/50 uppercase tracking-[0.15em]">Expiring Soon</p>
                   <p className={`font-headline-xl text-[40px] lg:text-[48px] leading-none mt-xs tracking-tighter ${

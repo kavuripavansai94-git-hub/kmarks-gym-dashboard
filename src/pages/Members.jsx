@@ -367,7 +367,10 @@ export default function Members() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-green-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center justify-between">
+          <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[80px]">check_circle</span>
+          </div>
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Active</p>
               <p className="font-headline-xl text-[28px] lg:text-[36px] text-green-500 leading-none mt-xs tracking-tighter">
@@ -387,7 +390,10 @@ export default function Members() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-yellow-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center justify-between">
+          <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[80px]">schedule</span>
+          </div>
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Expiring</p>
               <p className="font-headline-xl text-[28px] lg:text-[36px] text-yellow-500 leading-none mt-xs tracking-tighter">
@@ -407,7 +413,10 @@ export default function Members() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-error scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center justify-between">
+          <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[80px]">cancel</span>
+          </div>
+          <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Expired</p>
               <p className="font-headline-xl text-[28px] lg:text-[36px] text-error leading-none mt-xs tracking-tighter">
