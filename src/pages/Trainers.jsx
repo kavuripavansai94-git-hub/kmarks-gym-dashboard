@@ -132,7 +132,7 @@ export default function Trainers() {
       {/* ─── Header Section ─── */}
       <section className="relative overflow-hidden border border-white/5 bg-gradient-to-br from-surface-container via-surface-container-high to-surface-container">
         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
-        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-primary-container/5 rounded-full blur-3xl"></div>
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-container/5 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative p-md lg:py-md lg:px-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-md">
           <div>

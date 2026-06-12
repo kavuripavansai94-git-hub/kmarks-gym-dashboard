@@ -1,9 +1,15 @@
 import React, { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 
 export default function Sidebar() {
   const { logout } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const navItems = [
     { path: '/dashboard', name: 'Dashboard', icon: 'dashboard' },
@@ -45,7 +51,7 @@ export default function Sidebar() {
       {/* Logout button at the bottom */}
       <div className="px-md mt-auto">
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="w-full flex items-center gap-sm py-sm font-label-bold text-label-bold uppercase text-on-surface hover:text-error opacity-70 hover:opacity-100 transition-colors duration-200 text-left active:scale-95"
         >
           <span className="material-symbols-outlined mr-md">logout</span>

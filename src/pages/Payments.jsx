@@ -1,18 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
+// Animated counter
+function AnimCount({ value, dur = 600, prefix = '', suffix = '' }) {
+  const [d, setD] = useState(0);
+  useEffect(() => {
+    if (!value) { setD(0); return; }
+    let s = 0; const step = Math.ceil(value / (dur / 16));
+    const t = setInterval(() => { s += step; if (s >= value) { setD(value); clearInterval(t); } else setD(s); }, 16);
+    return () => clearInterval(t);
+  }, [value, dur]);
+  return <>{prefix}{d.toLocaleString()}{suffix}</>;
+}
+
 export default function Payments() {
-  // Data states
   const [payments, setPayments] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState(null);
+  const [actionSuccess, setActionSuccess] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   // Form states
   const [selectedMemberId, setSelectedMemberId] = useState('');
@@ -22,50 +36,37 @@ export default function Payments() {
   const [periodEnd, setPeriodEnd] = useState('');
   const [notes, setNotes] = useState('');
 
-  // Fetch payments and members from API
   const fetchData = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true); setError(null);
       const [paymentsRes, membersRes] = await Promise.all([
-        api.get('/api/payments'),
-        api.get('/api/members'),
+        api.get('/api/payments'), api.get('/api/members'),
       ]);
       setPayments(paymentsRes.data.payments || []);
       setMembers(membersRes.data.members || []);
     } catch (err) {
       console.error('Failed to fetch data:', err);
       setError('Failed to load payments. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Initialize form dates
   useEffect(() => {
     if (isFormOpen) {
       const today = new Date().toISOString().split('T')[0];
-      const nextMonth = new Date();
-      nextMonth.setMonth(nextMonth.getMonth() + 1);
-      setPeriodStart(today);
-      setPeriodEnd(nextMonth.toISOString().split('T')[0]);
+      const nextMonth = new Date(); nextMonth.setMonth(nextMonth.getMonth() + 1);
+      setPeriodStart(today); setPeriodEnd(nextMonth.toISOString().split('T')[0]);
     }
   }, [isFormOpen]);
 
-  // Helper: compute display status
   const computePaymentStatus = (payment) => {
     if (payment.status === 'completed') return 'Paid';
     if (payment.status === 'failed') return 'Failed';
     if (payment.status === 'refunded') return 'Refunded';
     if (payment.status === 'pending') {
-      // Check if overdue (period_end < today)
       if (payment.period_end) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = new Date(); today.setHours(0, 0, 0, 0);
         const dueDate = new Date(payment.period_end);
         if (dueDate < today) return 'Overdue';
       }
@@ -74,7 +75,6 @@ export default function Payments() {
     return payment.status;
   };
 
-  // Transform API payment data for display
   const displayPayments = payments.map((p) => {
     const user = p.users || {};
     return {
@@ -90,96 +90,76 @@ export default function Payments() {
     };
   });
 
-  // Compute financial stats
-  const totalRevenue = displayPayments
-    .filter(p => p.status === 'Paid')
-    .reduce((sum, p) => sum + p.amount, 0);
-
+  const totalRevenue = displayPayments.filter(p => p.status === 'Paid').reduce((sum, p) => sum + p.amount, 0);
   const totalPaidCount = displayPayments.filter(p => p.status === 'Paid').length;
-  const totalOverdueAmount = displayPayments
-    .filter(p => p.status === 'Overdue')
-    .reduce((sum, p) => sum + p.amount, 0);
-
-  const pendingAmount = displayPayments
-    .filter(p => p.status === 'Pending')
-    .reduce((sum, p) => sum + p.amount, 0);
+  const totalOverdueAmount = displayPayments.filter(p => p.status === 'Overdue').reduce((sum, p) => sum + p.amount, 0);
+  const pendingAmount = displayPayments.filter(p => p.status === 'Pending').reduce((sum, p) => sum + p.amount, 0);
 
   const filteredPayments = displayPayments.filter((payment) => {
     const matchesSearch = payment.memberName.toLowerCase().includes(searchTerm.toLowerCase()) || payment.transactionId.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === '' || payment.status === selectedStatus;
+    const matchesStatus = !selectedStatus || payment.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
+
+  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedPayments = filteredPayments.slice(startIndex, startIndex + itemsPerPage);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setActionLoading(true);
-      setActionError(null);
-
-      // Find the member's user_id from the members list
+      setActionLoading(true); setActionError(null);
       const member = members.find(m => m.id === selectedMemberId);
       const memberId = member?.user_id || selectedMemberId;
-
       await api.post('/api/payments', {
-        member_id: memberId,
-        amount: parseFloat(amount),
-        payment_method: paymentMethod,
-        period_start: periodStart,
-        period_end: periodEnd,
-        notes: notes || null,
+        member_id: memberId, amount: parseFloat(amount),
+        payment_method: paymentMethod, period_start: periodStart,
+        period_end: periodEnd, notes: notes || null,
       });
-
-      // Reset Form
-      setSelectedMemberId('');
-      setAmount('');
-      setPaymentMethod('cash');
-      setNotes('');
-      setIsFormOpen(false);
-
-      // Refresh data
+      setSelectedMemberId(''); setAmount(''); setPaymentMethod('cash'); setNotes('');
+      setIsFormOpen(false); setCurrentPage(1);
+      setActionSuccess('Payment recorded successfully.');
+      setTimeout(() => setActionSuccess(null), 3000);
       await fetchData();
     } catch (err) {
-      console.error('Failed to record payment:', err);
       setActionError(err.response?.data?.error || 'Failed to record payment.');
-    } finally {
-      setActionLoading(false);
-    }
+    } finally { setActionLoading(false); }
   };
 
   const handleUpdateStatus = async (paymentId, newStatus) => {
     try {
-      setActionLoading(true);
-      setActionError(null);
+      setActionLoading(true); setActionError(null);
       await api.put(`/api/payments/${paymentId}`, { status: newStatus });
+      setActionSuccess('Payment status updated.');
+      setTimeout(() => setActionSuccess(null), 3000);
       await fetchData();
     } catch (err) {
-      console.error('Failed to update payment:', err);
-      setActionError(err.response?.data?.error || 'Failed to update payment status.');
-    } finally {
-      setActionLoading(false);
-    }
+      setActionError(err.response?.data?.error || 'Failed to update status.');
+    } finally { setActionLoading(false); }
   };
 
-  // Loading state
+  // Loading
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="flex flex-col items-center gap-md">
-          <div className="w-12 h-12 border-4 border-primary-container border-t-transparent rounded-full animate-spin"></div>
-          <span className="font-label-bold text-outline uppercase tracking-wider">Loading Payments...</span>
+      <div className="flex flex-col items-center justify-center min-h-[500px] gap-md">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 border-4 border-primary-container/20 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-primary-container border-t-transparent rounded-full animate-spin"></div>
         </div>
+        <span className="font-label-bold text-label-md text-primary-container uppercase tracking-[0.25em] animate-pulse">Loading Payments...</span>
       </div>
     );
   }
 
-  // Error state
+  // Error
   if (error) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="flex flex-col items-center gap-md text-center">
-          <span className="material-symbols-outlined text-error text-[48px]">error</span>
-          <span className="font-label-bold text-error uppercase">{error}</span>
-          <button onClick={fetchData} className="brutalist-border px-lg py-sm font-label-bold uppercase hover:bg-surface-container-highest transition-colors">
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="bg-surface-container border-2 border-error p-lg flex flex-col items-center gap-md max-w-md text-center shadow-[6px_6px_0px_0px_rgba(239,68,68,0.2)]">
+          <span className="material-symbols-outlined text-error" style={{ fontSize: '48px' }}>error</span>
+          <h3 className="font-headline-md text-[18px] text-white uppercase">Connection Failed</h3>
+          <p className="font-body-md text-[12px] text-on-surface/60">{error}</p>
+          <button onClick={fetchData} className="bg-error text-white font-label-bold text-[12px] px-md py-sm uppercase hover:bg-white hover:text-black transition-colors active:scale-95">
             Retry
           </button>
         </div>
@@ -188,114 +168,244 @@ export default function Payments() {
   }
 
   return (
-    <div className="space-y-lg p-md lg:p-0">
-      {/* Action error toast */}
+    <div className="space-y-md lg:space-y-lg relative">
+      {/* ─── Notification Toasts ─── */}
       {actionError && (
-        <div className="bg-error/10 border border-error text-error px-md py-sm font-label-bold uppercase flex justify-between items-center">
-          <span>{actionError}</span>
-          <button onClick={() => setActionError(null)} className="material-symbols-outlined text-[18px]">close</button>
+        <div className="bg-error/10 border border-error/30 text-error px-md py-sm font-label-bold text-[11px] uppercase flex justify-between items-center animate-[slideDown_0.3s_ease]">
+          <div className="flex items-center gap-sm">
+            <span className="material-symbols-outlined text-[16px]">error</span>
+            <span>{actionError}</span>
+          </div>
+          <button onClick={() => setActionError(null)} className="material-symbols-outlined text-[16px] hover:text-white transition-colors">close</button>
+        </div>
+      )}
+      {actionSuccess && (
+        <div className="bg-green-500/10 border border-green-500/30 text-green-500 px-md py-sm font-label-bold text-[11px] uppercase flex justify-between items-center animate-[slideDown_0.3s_ease]">
+          <div className="flex items-center gap-sm">
+            <span className="material-symbols-outlined text-[16px]">check_circle</span>
+            <span>{actionSuccess}</span>
+          </div>
+          <button onClick={() => setActionSuccess(null)} className="material-symbols-outlined text-[16px] hover:text-white transition-colors">close</button>
         </div>
       )}
 
-      {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-md mb-lg">
-        <div>
-          <p className="font-label-bold text-primary-container uppercase tracking-widest mb-xs text-xs">Billing & Accounting</p>
-          <h3 className="font-headline-lg text-headline-lg text-on-surface uppercase">PAYMENTS</h3>
-        </div>
-        <button
-          onClick={() => setIsFormOpen(true)}
-          className="bg-primary-container text-on-primary-container px-lg py-sm font-headline-md text-headline-md uppercase flex items-center justify-center gap-xs hover:scale-105 active:scale-95 transition-transform shrink-0 self-start sm:self-auto shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
-        >
-          <span className="material-symbols-outlined">add</span>
-          RECORD PAYMENT
-        </button>
-      </div>
+      {/* ─── Header Section ─── */}
+      <section className="relative overflow-hidden border border-white/5 bg-gradient-to-br from-surface-container via-surface-container-high to-surface-container">
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-container/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Financial Metrics Bento Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter mb-lg">
-        <div className="bg-surface-container border border-white/10 p-md flex flex-col justify-between">
-          <span className="font-label-bold text-outline uppercase text-[12px]">Total Revenue</span>
-          <span className="font-headline-xl text-headline-xl text-primary-container">₹{totalRevenue.toLocaleString()}</span>
-        </div>
-        <div className="bg-surface-container border border-white/10 p-md flex flex-col justify-between">
-          <span className="font-label-bold text-outline uppercase text-[12px]">Paid Invoices</span>
-          <span className="font-headline-xl text-headline-xl text-on-surface">{totalPaidCount}</span>
-        </div>
-        <div className="bg-surface-container border border-error/40 p-md flex flex-col justify-between">
-          <span className="font-label-bold text-error uppercase text-[12px]">Overdue Collections</span>
-          <span className="font-headline-xl text-headline-xl text-error">₹{totalOverdueAmount.toLocaleString()}</span>
-        </div>
-        <div className="bg-surface-container border border-white/10 p-md flex flex-col justify-between">
-          <span className="font-label-bold text-outline uppercase text-[12px]">Pending Invoices</span>
-          <span className="font-headline-xl text-headline-xl text-on-surface">₹{pendingAmount.toLocaleString()}</span>
-        </div>
-      </div>
-
-      {/* Search & Filters Row */}
-      <section className="grid grid-cols-1 md:grid-cols-12 gap-md mb-lg">
-        <div className="md:col-span-8 flex items-center bg-surface-container-low brutalist-border brutalist-border-focus group px-sm">
-          <span className="material-symbols-outlined text-outline-variant group-focus-within:text-primary-container transition-colors">search</span>
-          <input
-            type="text"
-            placeholder="SEARCH TRANSACTIONS BY MEMBER NAME OR TRANSACTION ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-label-bold py-md placeholder:text-outline-variant/60 uppercase"
-          />
-        </div>
-        <div className="md:col-span-4 brutalist-border bg-surface-container-low">
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-label-bold py-md px-sm uppercase appearance-none"
-          >
-            <option value="">All Statuses</option>
-            <option value="Paid">Paid</option>
-            <option value="Overdue">Overdue</option>
-            <option value="Pending">Pending</option>
-          </select>
+        <div className="relative p-md lg:py-md lg:px-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-md">
+          <div>
+            <p className="font-label-bold text-[10px] text-primary-container uppercase tracking-[0.3em] mb-xs">Billing & Accounting</p>
+            <h1 className="font-headline-lg text-[28px] lg:text-[32px] text-white uppercase tracking-tight leading-none">
+              Payments
+            </h1>
+          </div>
+          <div className="flex gap-sm">
+            <button
+              onClick={() => setIsFormOpen(true)}
+              className="bg-primary-container text-on-primary font-label-bold text-[12px] px-md py-sm uppercase hover:brightness-110 active:scale-95 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] flex items-center gap-xs"
+            >
+              <span className="material-symbols-outlined text-[18px]">add</span>
+              Record Payment
+            </button>
+            <button
+              onClick={fetchData}
+              className="border border-white/20 text-white/70 font-label-bold text-[12px] px-sm py-sm uppercase hover:border-primary-container hover:text-primary-container active:scale-95 transition-all"
+            >
+              <span className="material-symbols-outlined text-[18px]">refresh</span>
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* Ledger Table */}
-      <div className="bg-surface-container border border-white/10 overflow-hidden">
+      {/* ─── Stats Strip ─── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-sm lg:gap-gutter">
+        {/* Total Revenue - Informational */}
+        <div className="group relative bg-surface-container border border-white/[0.06] p-sm lg:p-md overflow-hidden hover:border-primary-container/30 transition-all">
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Total Revenue</p>
+              <p className="font-headline-xl text-[24px] lg:text-[32px] text-primary-container leading-none mt-xs tracking-tighter">
+                <AnimCount value={totalRevenue} prefix="₹" />
+              </p>
+            </div>
+            <div className="w-8 h-8 bg-primary-container/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-primary-container text-[18px]">account_balance</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Paid Invoices */}
+        <button
+          onClick={() => { setSelectedStatus('Paid'); setCurrentPage(1); }}
+          className={`group relative bg-surface-container border p-sm lg:p-md transition-all duration-300 text-left overflow-hidden ${
+            selectedStatus === 'Paid' ? 'border-green-500/40' : 'border-white/[0.06] hover:border-green-500/30'
+          }`}
+        >
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-green-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Paid Invoices</p>
+              <p className="font-headline-xl text-[24px] lg:text-[32px] text-green-500 leading-none mt-xs tracking-tighter">
+                <AnimCount value={totalPaidCount} />
+              </p>
+            </div>
+            <div className="w-8 h-8 bg-green-500/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
+            </div>
+          </div>
+        </button>
+
+        {/* Pending Invoices */}
+        <button
+          onClick={() => { setSelectedStatus('Pending'); setCurrentPage(1); }}
+          className={`group relative bg-surface-container border p-sm lg:p-md transition-all duration-300 text-left overflow-hidden hidden md:block ${
+            selectedStatus === 'Pending' ? 'border-yellow-500/40' : 'border-white/[0.06] hover:border-yellow-500/30'
+          }`}
+        >
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-yellow-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Pending</p>
+              <p className="font-headline-xl text-[24px] lg:text-[32px] text-yellow-500 leading-none mt-xs tracking-tighter">
+                <AnimCount value={pendingAmount} prefix="₹" />
+              </p>
+            </div>
+            <div className="w-8 h-8 bg-yellow-500/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-yellow-500 text-[18px]">pending_actions</span>
+            </div>
+          </div>
+        </button>
+
+        {/* Overdue */}
+        <button
+          onClick={() => { setSelectedStatus('Overdue'); setCurrentPage(1); }}
+          className={`group relative bg-surface-container border p-sm lg:p-md transition-all duration-300 text-left overflow-hidden ${
+            selectedStatus === 'Overdue' ? 'border-error/40' : 'border-white/[0.06] hover:border-error/30'
+          }`}
+        >
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-error scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-label-bold text-[9px] lg:text-[10px] text-on-surface/40 uppercase tracking-[0.15em]">Overdue</p>
+              <p className="font-headline-xl text-[24px] lg:text-[32px] text-error leading-none mt-xs tracking-tighter">
+                <AnimCount value={totalOverdueAmount} prefix="₹" />
+              </p>
+            </div>
+            <div className="w-8 h-8 bg-error/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-error text-[18px]">warning</span>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* ─── Search & Filters ─── */}
+      <section className="flex flex-col sm:flex-row gap-sm">
+        <div className="flex-grow flex items-center bg-surface-container border border-white/[0.06] group px-sm focus-within:border-primary-container/50 transition-colors">
+          <span className="material-symbols-outlined text-on-surface/30 group-focus-within:text-primary-container transition-colors text-[20px]">search</span>
+          <input
+            type="text"
+            placeholder="Search by member name or transaction ID..."
+            value={searchTerm}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+            className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-[13px] py-sm placeholder:text-on-surface/25 pl-sm"
+          />
+          {searchTerm && (
+            <button onClick={() => { setSearchTerm(''); setCurrentPage(1); }} className="material-symbols-outlined text-on-surface/30 hover:text-white text-[18px] transition-colors">close</button>
+          )}
+        </div>
+        <div className="flex gap-sm">
+          <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
+            <select
+              value={selectedStatus}
+              onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
+              className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
+            >
+              <option value="">All Statuses</option>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+              <option value="Overdue">Overdue</option>
+              <option value="Failed">Failed</option>
+            </select>
+          </div>
+          {selectedStatus && (
+            <button
+              onClick={() => { setSelectedStatus(''); setCurrentPage(1); }}
+              className="border border-white/10 px-sm font-label-bold text-[10px] uppercase text-on-surface/50 hover:text-primary-container hover:border-primary-container/30 transition-colors flex items-center gap-[4px]"
+            >
+              <span className="material-symbols-outlined text-[14px]">filter_alt_off</span>
+              Clear
+            </button>
+          )}
+        </div>
+      </section>
+
+      {/* ─── Payments Table ─── */}
+      <div className="bg-surface-container border border-white/[0.06] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-outline bg-surface-container-low">
-                <th className="px-md py-sm font-label-bold text-outline uppercase tracking-wider">Member Name</th>
-                <th className="px-md py-sm font-label-bold text-outline uppercase tracking-wider">Amount</th>
-                <th className="px-md py-sm font-label-bold text-outline uppercase tracking-wider">Method</th>
-                <th className="px-md py-sm font-label-bold text-outline uppercase tracking-wider">Date</th>
-                <th className="px-md py-sm font-label-bold text-outline uppercase tracking-wider text-center">Status</th>
-                <th className="px-md py-sm font-label-bold text-outline uppercase tracking-wider text-right">Actions</th>
+              <tr className="border-b border-white/[0.06]">
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Member & ID</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Amount</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden md:table-cell">Method</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Date</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider text-center">Status</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-outline/20">
-              {filteredPayments.map((payment) => (
-                <tr key={payment.id} className="hover:bg-surface-container-high transition-colors group">
-                  <td className="px-md py-md font-body-lg font-bold text-white uppercase">{payment.memberName}</td>
-                  <td className="px-md py-md font-body-lg font-bold text-white">₹{payment.amount.toLocaleString()}</td>
-                  <td className="px-md py-md font-body-md text-on-surface uppercase">{payment.paymentMethod}</td>
-                  <td className="px-md py-md font-body-md text-on-surface opacity-75">{payment.date}</td>
-                  <td className="px-md py-md text-center">
-                    <span className={`brutalist-border px-sm py-xs font-label-bold text-[10px] uppercase ${
+            <tbody>
+              {paginatedPayments.map((payment, idx) => (
+                <tr
+                  key={payment.id}
+                  className={`group hover:bg-white/[0.02] transition-colors ${idx < paginatedPayments.length - 1 ? 'border-b border-white/[0.03]' : ''}`}
+                >
+                  <td className="py-sm px-md">
+                    <div className="flex items-center gap-sm">
+                      <div className="w-9 h-9 bg-gradient-to-br from-primary-container/20 to-primary-container/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:border-primary-container/40 transition-colors">
+                        <span className="font-headline-md text-[14px] text-primary-container">{payment.memberName.charAt(0)}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-body-md text-[13px] font-bold text-white uppercase truncate leading-tight">{payment.memberName}</p>
+                        <p className="font-label-sm text-[10px] text-on-surface/35 truncate">ID: {payment.transactionId}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-sm px-md font-body-lg text-[15px] font-bold text-white">
+                    ₹{payment.amount.toLocaleString()}
+                  </td>
+                  <td className="py-sm px-md hidden md:table-cell">
+                    <span className="border border-white/10 px-sm py-[3px] font-label-bold text-[9px] uppercase text-on-surface/60 group-hover:border-primary-container/30 transition-colors">
+                      {payment.paymentMethod}
+                    </span>
+                  </td>
+                  <td className="py-sm px-md font-body-md text-[12px] text-on-surface/40 hidden lg:table-cell">
+                    {payment.date}
+                  </td>
+                  <td className="py-sm px-md text-center">
+                    <span className={`inline-flex items-center gap-[4px] px-sm py-[3px] font-label-bold text-[9px] uppercase ${
                       payment.status === 'Paid'
-                        ? 'bg-green-500/10 text-green-500 border-green-500'
+                        ? 'bg-green-500/10 text-green-500 border border-green-500/20'
                         : payment.status === 'Overdue'
-                        ? 'bg-error/10 text-error border-error'
-                        : 'bg-yellow-500/10 text-yellow-500 border-yellow-500'
+                        ? 'bg-error/10 text-error border border-error/20'
+                        : payment.status === 'Pending'
+                        ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
+                        : 'bg-white/5 text-on-surface/50 border border-white/10'
                     }`}>
+                      <span className={`w-[5px] h-[5px] rounded-full ${
+                        payment.status === 'Paid' ? 'bg-green-500' : payment.status === 'Overdue' ? 'bg-error' : payment.status === 'Pending' ? 'bg-yellow-500' : 'bg-on-surface/30'
+                      }`}></span>
                       {payment.status}
                     </span>
                   </td>
-                  <td className="px-md py-md text-right">
+                  <td className="py-sm px-md text-right">
                     {(payment.status === 'Pending' || payment.status === 'Overdue') && (
                       <button
                         onClick={() => handleUpdateStatus(payment.id, 'completed')}
                         disabled={actionLoading}
-                        className="brutalist-border px-sm py-xs font-label-bold text-[10px] uppercase bg-green-500/10 text-green-500 border-green-500 hover:bg-green-500/20 transition-colors disabled:opacity-50"
+                        className="border border-green-500/30 text-green-500 px-sm py-[4px] font-label-bold text-[9px] uppercase hover:bg-green-500/10 transition-colors disabled:opacity-30"
                       >
                         Mark Paid
                       </button>
@@ -303,10 +413,15 @@ export default function Payments() {
                   </td>
                 </tr>
               ))}
-              {filteredPayments.length === 0 && (
+              {paginatedPayments.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="py-lg text-center font-label-bold text-outline uppercase">
-                    No Transaction Records
+                  <td colSpan="6" className="py-xl text-center">
+                    <div className="flex flex-col items-center gap-sm">
+                      <span className="material-symbols-outlined text-on-surface/15 text-[40px]">receipt_long</span>
+                      <p className="font-label-bold text-[11px] text-on-surface/25 uppercase tracking-wider">
+                        {searchTerm || selectedStatus ? 'No matching records found' : 'No transactions yet'}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -315,121 +430,162 @@ export default function Payments() {
         </div>
       </div>
 
-      {/* Record Payment Modal */}
-      {isFormOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-margin-mobile">
-          <div className="bg-surface border border-white/20 p-md lg:p-lg w-full max-w-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-primary-container"></div>
+      {/* ─── Pagination ─── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="font-label-bold text-[10px] text-on-surface/30 uppercase">
+            {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredPayments.length)} of {filteredPayments.length}
+          </p>
+          <div className="flex items-center gap-[4px]">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => p - 1)}
+              className="w-8 h-8 flex items-center justify-center border border-white/[0.06] text-on-surface/40 hover:text-primary-container hover:border-primary-container/30 transition-all disabled:opacity-20 disabled:pointer-events-none"
+            >
+              <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+            </button>
+            {Array.from({ length: totalPages }).map((_, i) => {
+              const page = i + 1;
+              if (page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1) {
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 font-label-bold text-[11px] transition-all ${
+                      currentPage === page
+                        ? 'bg-primary-container/15 text-primary-container border border-primary-container/30'
+                        : 'text-on-surface/30 hover:text-primary-container border border-transparent'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              }
+              if (page === 2 && currentPage > 3) return <span key="dots-start" className="text-on-surface/20 px-[4px] text-[10px]">…</span>;
+              if (page === totalPages - 1 && currentPage < totalPages - 2) return <span key="dots-end" className="text-on-surface/20 px-[4px] text-[10px]">…</span>;
+              return null;
+            })}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => p + 1)}
+              className="w-8 h-8 flex items-center justify-center border border-white/[0.06] text-on-surface/40 hover:text-primary-container hover:border-primary-container/30 transition-all disabled:opacity-20 disabled:pointer-events-none"
+            >
+              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      )}
 
-            <div className="flex justify-between items-start mb-lg">
+      {/* ─── Record Payment Modal ─── */}
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-margin-mobile" onClick={(e) => { if (e.target === e.currentTarget) { setIsFormOpen(false); setActionError(null); } }}>
+          <div className="bg-surface-container border border-white/10 w-full max-w-2xl relative overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
+            <div className="h-[2px] bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
+
+            <div className="p-md lg:px-lg lg:pt-lg flex justify-between items-start">
               <div>
-                <h1 className="font-headline-lg text-headline-lg uppercase text-on-surface">RECORD NEW PAYMENT</h1>
-                <div className="h-1 w-24 bg-primary-container mt-xs"></div>
+                <p className="font-label-bold text-[10px] text-primary-container uppercase tracking-[0.3em] mb-xs">New Transaction</p>
+                <h2 className="font-headline-lg text-[24px] text-white uppercase tracking-tight leading-none">Record Payment</h2>
               </div>
               <button
                 onClick={() => { setIsFormOpen(false); setActionError(null); }}
-                className="p-sm text-outline hover:text-white active:scale-95"
+                className="w-8 h-8 flex items-center justify-center text-on-surface/30 hover:text-white hover:bg-white/5 transition-all"
               >
-                <span className="material-symbols-outlined text-[28px]">close</span>
+                <span className="material-symbols-outlined text-[22px]">close</span>
               </button>
             </div>
 
             {actionError && (
-              <div className="bg-error/10 border border-error text-error px-md py-sm font-label-bold uppercase mb-md">
+              <div className="mx-md lg:mx-lg bg-error/10 border border-error/20 text-error px-md py-sm font-label-bold text-[10px] uppercase flex items-center gap-sm">
+                <span className="material-symbols-outlined text-[14px]">error</span>
                 {actionError}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-lg">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-bold text-label-bold uppercase text-secondary">Select Member</label>
-                  <select
-                    value={selectedMemberId}
-                    onChange={(e) => setSelectedMemberId(e.target.value)}
-                    required
-                    className="w-full bg-surface-container-lowest border border-on-surface/20 px-md py-sm text-on-surface focus:border-primary-container focus:ring-0 outline-none font-body-md"
-                  >
-                    <option value="">-- SELECT GYM MEMBER --</option>
-                    {members.map(m => (
-                      <option key={m.id} value={m.id}>{m.users?.name || 'Member'}</option>
-                    ))}
-                  </select>
+            <form onSubmit={handleSubmit} className="p-md lg:px-lg lg:pb-lg space-y-md">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Select Member *</label>
+                  <div className="relative">
+                    <select
+                      value={selectedMemberId} onChange={(e) => setSelectedMemberId(e.target.value)} required
+                      className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
+                    >
+                      <option value="">-- SELECT GYM MEMBER --</option>
+                      {members.map(m => <option key={m.id} value={m.id}>{m.users?.name || 'Member'}</option>)}
+                    </select>
+                    <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-bold text-label-bold uppercase text-secondary">Amount (₹)</label>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Amount (₹) *</label>
                   <input
-                    type="number"
-                    placeholder="ENTER TRANSACTION VALUE"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    required
-                    className="bg-surface-container-lowest border border-on-surface/20 px-md py-sm text-on-surface placeholder:text-outline/50 focus:border-primary-container focus:ring-0 outline-none transition-all font-body-md"
+                    type="number" placeholder="Enter amount" value={amount}
+                    onChange={(e) => setAmount(e.target.value)} required
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] placeholder:text-on-surface/20 focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
                   />
                 </div>
 
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-bold text-label-bold uppercase text-secondary">Payment Method</label>
-                  <select
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full bg-surface-container-lowest border border-on-surface/20 px-md py-sm text-on-surface focus:border-primary-container focus:ring-0 outline-none font-body-md appearance-none"
-                  >
-                    <option value="cash">Cash</option>
-                    <option value="card">Card</option>
-                    <option value="upi">UPI</option>
-                    <option value="bank_transfer">Bank Transfer</option>
-                    <option value="other">Other</option>
-                  </select>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Payment Method</label>
+                  <div className="relative">
+                    <select
+                      value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
+                    >
+                      <option value="cash">Cash</option>
+                      <option value="card">Card</option>
+                      <option value="upi">UPI</option>
+                      <option value="bank_transfer">Bank Transfer</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-bold text-label-bold uppercase text-secondary">Notes</label>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Notes</label>
                   <input
-                    type="text"
-                    placeholder="OPTIONAL NOTES"
-                    value={notes}
+                    type="text" placeholder="Optional notes" value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="bg-surface-container-lowest border border-on-surface/20 px-md py-sm text-on-surface placeholder:text-outline/50 focus:border-primary-container focus:ring-0 outline-none transition-all font-body-md"
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] placeholder:text-on-surface/20 focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
                   />
                 </div>
 
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-bold text-label-bold uppercase text-secondary">Period Start</label>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Period Start</label>
                   <input
-                    type="date"
-                    value={periodStart}
-                    onChange={(e) => setPeriodStart(e.target.value)}
-                    className="bg-surface-container-lowest border border-on-surface/20 px-md py-sm text-on-surface focus:border-primary-container focus:ring-0 outline-none transition-all font-body-md"
+                    type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)}
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
                   />
                 </div>
 
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-bold text-label-bold uppercase text-secondary">Period End</label>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Period End</label>
                   <input
-                    type="date"
-                    value={periodEnd}
-                    onChange={(e) => setPeriodEnd(e.target.value)}
-                    className="bg-surface-container-lowest border border-on-surface/20 px-md py-sm text-on-surface focus:border-primary-container focus:ring-0 outline-none transition-all font-body-md"
+                    type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)}
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
                   />
                 </div>
               </div>
 
-              <div className="pt-lg border-t border-on-surface/10 flex flex-col md:flex-row gap-md justify-end">
+              <div className="pt-md border-t border-white/[0.06] flex gap-sm justify-end">
                 <button
-                  type="button"
-                  onClick={() => { setIsFormOpen(false); setActionError(null); }}
-                  className="px-lg py-sm border-2 border-on-surface font-label-bold text-label-bold uppercase text-on-surface hover:bg-on-surface/10 transition-all active:scale-95"
+                  type="button" onClick={() => { setIsFormOpen(false); setActionError(null); }}
+                  className="px-md py-sm border border-white/10 font-label-bold text-[11px] uppercase text-on-surface/50 hover:text-white hover:border-white/30 transition-all active:scale-95"
                 >
-                  CANCEL
+                  Cancel
                 </button>
                 <button
-                  type="submit"
-                  disabled={actionLoading}
-                  className="px-lg py-sm bg-primary-container font-label-bold text-label-bold uppercase text-on-primary hover:bg-primary-fixed-dim transition-all active:scale-95 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] disabled:opacity-50"
+                  type="submit" disabled={actionLoading}
+                  className="px-md py-sm bg-primary-container text-on-primary font-label-bold text-[11px] uppercase hover:brightness-110 transition-all active:scale-95 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] disabled:opacity-50 flex items-center gap-xs"
                 >
-                  {actionLoading ? 'RECORDING...' : 'RECORD TRANSACTION'}
+                  {actionLoading ? (
+                    <><div className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></div> Recording...</>
+                  ) : (
+                    <><span className="material-symbols-outlined text-[16px]">receipt_long</span> Record Payment</>
+                  )}
                 </button>
               </div>
             </form>
