@@ -250,8 +250,8 @@ export default function Trainers() {
         <div className="group relative bg-surface-container border border-white/[0.06] p-sm lg:p-md overflow-hidden hover:border-primary-container/30 transition-all">
           <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
           <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
-            <div className="absolute w-[100px] h-[100px] bg-white/5 rounded-full blur-[30px] group-hover:bg-white/10 transition-colors duration-700"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-white/[0.02] group-hover:text-white/20 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">groups</span>
+            <div className="absolute w-[100px] h-[100px] bg-white/10 rounded-full blur-[30px] group-hover:bg-white/20 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-white/10 group-hover:text-white/40 transition-all duration-700 group-hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.6)]">groups</span>
           </div>
           <div className="flex items-center justify-between relative z-10">
             <div>
@@ -266,8 +266,8 @@ export default function Trainers() {
         <div className="group relative bg-surface-container border border-white/[0.06] p-sm lg:p-md overflow-hidden hover:border-primary-container/30 transition-all">
           <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
           <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
-            <div className="absolute w-[100px] h-[100px] bg-green-500/10 rounded-full blur-[30px] group-hover:bg-green-500/20 transition-colors duration-700"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-green-500/[0.05] group-hover:text-green-500/30 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]">assignment_ind</span>
+            <div className="absolute w-[100px] h-[100px] bg-green-500/20 rounded-full blur-[30px] group-hover:bg-green-500/40 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-green-500/15 group-hover:text-green-500/50 transition-all duration-700 group-hover:drop-shadow-[0_0_25px_rgba(34,197,94,0.8)]">assignment_ind</span>
           </div>
           <div className="flex items-center justify-between relative z-10">
             <div>
@@ -282,8 +282,8 @@ export default function Trainers() {
         <div className="group relative bg-surface-container border border-white/[0.06] p-sm lg:p-md overflow-hidden hover:border-primary-container/30 transition-all hidden md:block">
           <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
           <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
-            <div className="absolute w-[100px] h-[100px] bg-cyan-500/10 rounded-full blur-[30px] group-hover:bg-cyan-500/20 transition-colors duration-700"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-cyan-500/[0.05] group-hover:text-cyan-500/30 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(6,182,212,0.6)]">fitness_center</span>
+            <div className="absolute w-[100px] h-[100px] bg-cyan-500/20 rounded-full blur-[30px] group-hover:bg-cyan-500/40 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-cyan-500/15 group-hover:text-cyan-500/50 transition-all duration-700 group-hover:drop-shadow-[0_0_25px_rgba(6,182,212,0.8)]">fitness_center</span>
           </div>
           <div className="flex items-center justify-between relative z-10">
             <div>
