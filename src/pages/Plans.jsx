@@ -464,9 +464,10 @@ export default function Plans() {
         </div>
 
         {/* KPI 4 */}
-        <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-            <span className="material-symbols-outlined text-[80px]">payments</span>
+        <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-blue-500/20 rounded-full blur-[30px] group-hover:bg-blue-500/40 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-blue-500/15 group-hover:text-blue-500/50 transition-all duration-700 group-hover:drop-shadow-[0_0_25px_rgba(59,130,246,0.8)]">payments</span>
           </div>
           <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Avg Plan Price</p>
           <div className="flex items-baseline gap-xs">
