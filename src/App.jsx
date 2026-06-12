@@ -13,6 +13,7 @@ import MemberProfile from './pages/MemberProfile';
 import TrainerProfile from './pages/TrainerProfile';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import Plans from './pages/Plans';
 
 // Layout wrapper for all authenticated dashboard pages
 function DashboardLayout() {
@@ -66,6 +67,7 @@ export default function App() {
           <Route path="payments" element={<Payments />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="analytics" element={<Analytics />} />
+          <Route path="plans" element={<Plans />} />
           <Route path="settings" element={<Settings />} />
         </Route>
 
