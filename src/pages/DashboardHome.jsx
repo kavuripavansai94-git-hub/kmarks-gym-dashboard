@@ -484,68 +484,6 @@ export default function DashboardHome() {
           </table>
         </div>
       </section>
-
-      {/* ─── Quick Actions ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-sm lg:gap-gutter">
-        <button
-          onClick={() => navigate('/announcements')}
-          className="group bg-surface-container border border-white/[0.06] p-md text-left hover:border-primary-container/40 transition-all duration-300 relative overflow-hidden"
-        >
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center gap-sm mb-sm">
-            <div className="w-8 h-8 bg-primary-container/10 flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
-              <span className="material-symbols-outlined text-primary-container text-[18px]">campaign</span>
-            </div>
-            <h4 className="font-headline-md text-[14px] text-white uppercase">Broadcast</h4>
-          </div>
-          <p className="font-body-md text-[11px] text-on-surface/40 leading-relaxed">Send announcements to all active members via dashboard.</p>
-        </button>
-
-        <button
-          onClick={async () => {
-            try {
-              const [membersRes, paymentsRes] = await Promise.all([api.get('/api/members'), api.get('/api/payments')]);
-              const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
-                exported_at: new Date().toISOString(),
-                members: membersRes.data.members,
-                payments: paymentsRes.data.payments
-              }, null, 2));
-              const anchor = document.createElement('a');
-              anchor.setAttribute("href", dataStr);
-              anchor.setAttribute("download", `kmarks_report_${new Date().toISOString().slice(0, 10)}.json`);
-              document.body.appendChild(anchor);
-              anchor.click();
-              anchor.remove();
-            } catch (err) {
-              console.error("Export failed:", err);
-            }
-          }}
-          className="group bg-surface-container border border-white/[0.06] p-md text-left hover:border-primary-container/40 transition-all duration-300 relative overflow-hidden"
-        >
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center gap-sm mb-sm">
-            <div className="w-8 h-8 bg-primary-container/10 flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
-              <span className="material-symbols-outlined text-primary-container text-[18px]">download</span>
-            </div>
-            <h4 className="font-headline-md text-[14px] text-white uppercase">Export Report</h4>
-          </div>
-          <p className="font-body-md text-[11px] text-on-surface/40 leading-relaxed">Download member and revenue data as a JSON report.</p>
-        </button>
-
-        <button
-          onClick={() => navigate('/attendance')}
-          className="group bg-surface-container border border-white/[0.06] p-md text-left hover:border-primary-container/40 transition-all duration-300 relative overflow-hidden"
-        >
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="flex items-center gap-sm mb-sm">
-            <div className="w-8 h-8 bg-primary-container/10 flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
-              <span className="material-symbols-outlined text-primary-container text-[18px]">qr_code_scanner</span>
-            </div>
-            <h4 className="font-headline-md text-[14px] text-white uppercase">Check-In</h4>
-          </div>
-          <p className="font-body-md text-[11px] text-on-surface/40 leading-relaxed">Open the RFID / barcode scanner to check members in.</p>
-        </button>
-      </div>
     </div>
   );
 }
