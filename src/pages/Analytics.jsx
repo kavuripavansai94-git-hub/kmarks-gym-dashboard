@@ -200,7 +200,6 @@ export default function Analytics() {
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Total Revenue</span>
           <div className="flex items-end justify-between relative z-10">
             <span className="font-headline-xl text-[36px] text-primary-container leading-none tracking-tighter"><AnimCount value={totalRevenue} prefix="₹" /></span>
-            <span className="material-symbols-outlined text-primary-container/20 group-hover:text-primary-container/40 transition-colors text-[32px]">payments</span>
           </div>
         </div>
         
@@ -211,7 +210,6 @@ export default function Analytics() {
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Total Members</span>
           <div className="flex items-end justify-between relative z-10">
             <span className="font-headline-xl text-[36px] text-white leading-none tracking-tighter"><AnimCount value={members.length} /></span>
-            <span className="material-symbols-outlined text-white/10 group-hover:text-white/30 transition-colors text-[32px]">group</span>
           </div>
         </div>
 
@@ -222,7 +220,6 @@ export default function Analytics() {
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Avg Attendance (Month)</span>
           <div className="flex items-end justify-between relative z-10">
             <span className="font-headline-xl text-[36px] text-white leading-none tracking-tighter"><AnimCount value={avgAttendancePct} suffix="%" /></span>
-            <span className="material-symbols-outlined text-white/10 group-hover:text-white/30 transition-colors text-[32px]">trending_up</span>
           </div>
         </div>
 
@@ -233,7 +230,6 @@ export default function Analytics() {
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Active Members %</span>
           <div className="flex items-end justify-between relative z-10">
             <span className="font-headline-xl text-[36px] text-white leading-none tracking-tighter"><AnimCount value={activePct} suffix="%" /></span>
-            <span className="material-symbols-outlined text-green-500/20 group-hover:text-green-500/40 transition-colors text-[32px]">verified_user</span>
           </div>
         </div>
       </section>

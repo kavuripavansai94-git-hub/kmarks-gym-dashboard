@@ -377,9 +377,6 @@ export default function Members() {
                 <AnimCount value={activeCount} />
               </p>
             </div>
-            <div className="w-8 h-8 bg-green-500/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
-            </div>
           </div>
         </button>
 
@@ -400,9 +397,6 @@ export default function Members() {
                 <AnimCount value={expSoonCount} />
               </p>
             </div>
-            <div className="w-8 h-8 bg-yellow-500/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-yellow-500 text-[18px]">schedule</span>
-            </div>
           </div>
         </button>
 
@@ -422,9 +416,6 @@ export default function Members() {
               <p className="font-headline-xl text-[28px] lg:text-[36px] text-error leading-none mt-xs tracking-tighter">
                 <AnimCount value={expiredCount} />
               </p>
-            </div>
-            <div className="w-8 h-8 bg-error/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-error text-[18px]">cancel</span>
             </div>
           </div>
         </button>

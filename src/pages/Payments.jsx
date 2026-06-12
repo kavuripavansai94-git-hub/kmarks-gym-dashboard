@@ -305,9 +305,6 @@ export default function Payments() {
                 <AnimCount value={totalRevenue} prefix="₹" />
               </p>
             </div>
-            <div className="w-8 h-8 bg-primary-container/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary-container text-[18px]">account_balance</span>
-            </div>
           </div>
         </div>
 
@@ -328,9 +325,6 @@ export default function Payments() {
               <p className="font-headline-xl text-[24px] lg:text-[32px] text-green-500 leading-none mt-xs tracking-tighter">
                 <AnimCount value={totalPaidCount} />
               </p>
-            </div>
-            <div className="w-8 h-8 bg-green-500/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
             </div>
           </div>
         </button>
@@ -353,9 +347,6 @@ export default function Payments() {
                 <AnimCount value={pendingAmount} prefix="₹" />
               </p>
             </div>
-            <div className="w-8 h-8 bg-yellow-500/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-yellow-500 text-[18px]">pending_actions</span>
-            </div>
           </div>
         </button>
 
@@ -376,9 +367,6 @@ export default function Payments() {
               <p className="font-headline-xl text-[24px] lg:text-[32px] text-error leading-none mt-xs tracking-tighter">
                 <AnimCount value={totalOverdueAmount} prefix="₹" />
               </p>
-            </div>
-            <div className="w-8 h-8 bg-error/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-error text-[18px]">warning</span>
             </div>
           </div>
         </button>

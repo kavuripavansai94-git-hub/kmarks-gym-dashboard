@@ -411,9 +411,6 @@ export default function DashboardHome() {
                     <AnimatedNumber value={totalMembers} />
                   </p>
                 </div>
-                <div className="w-10 h-10 bg-primary-container/10 flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
-                  <span className="material-symbols-outlined text-primary-container text-[22px]">group</span>
-                </div>
               </div>
               <div className="flex items-center justify-between mt-sm">
                 <SparkBars data={memberWeekData} height={24} />
@@ -436,9 +433,6 @@ export default function DashboardHome() {
                   <p className="font-headline-xl text-[40px] lg:text-[48px] text-white leading-none mt-xs tracking-tighter">
                     <AnimatedNumber value={activeToday} />
                   </p>
-                </div>
-                <div className="w-10 h-10 bg-primary-container/10 flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
-                  <span className="material-symbols-outlined text-primary-container text-[22px]">bolt</span>
                 </div>
               </div>
               <div className="flex items-center justify-between mt-sm">
@@ -471,11 +465,6 @@ export default function DashboardHome() {
                     <AnimatedNumber value={overduePayments} />
                   </p>
                 </div>
-                <div className={`w-10 h-10 flex items-center justify-center transition-colors ${
-                  overduePayments > 0 ? 'bg-error/10 group-hover:bg-error/20' : 'bg-primary-container/10 group-hover:bg-primary-container/20'
-                }`}>
-                  <span className={`material-symbols-outlined text-[22px] ${overduePayments > 0 ? 'text-error animate-pulse' : 'text-primary-container'}`}>warning</span>
-                </div>
               </div>
               <div className="flex items-center justify-between mt-sm">
                 <div className="flex gap-[3px]">
@@ -505,9 +494,6 @@ export default function DashboardHome() {
                   }`}>
                     <AnimatedNumber value={expiringSoon} />
                   </p>
-                </div>
-                <div className="w-10 h-10 bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors">
-                  <span className="material-symbols-outlined text-yellow-500 text-[22px]">event_busy</span>
                 </div>
               </div>
               <div className="flex items-center justify-between mt-sm">

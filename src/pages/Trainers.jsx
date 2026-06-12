@@ -259,9 +259,6 @@ export default function Trainers() {
                 <AnimCount value={totalStaff} />
               </p>
             </div>
-            <div className="w-8 h-8 bg-primary-container/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary-container text-[18px]">groups</span>
-            </div>
           </div>
         </div>
 
@@ -277,9 +274,6 @@ export default function Trainers() {
                 <AnimCount value={totalAssignedMembers} />
               </p>
             </div>
-            <div className="w-8 h-8 bg-primary-container/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary-container text-[18px]">groups</span>
-            </div>
           </div>
         </div>
 
@@ -294,9 +288,6 @@ export default function Trainers() {
               <p className="font-headline-xl text-[28px] lg:text-[36px] text-white leading-none mt-xs tracking-tighter">
                 <AnimCount value={uniqueSpecialties} />
               </p>
-            </div>
-            <div className="w-8 h-8 bg-primary-container/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary-container text-[18px]">fitness_center</span>
             </div>
           </div>
         </div>
