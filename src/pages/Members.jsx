@@ -18,6 +18,7 @@ export default function Members() {
   const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [trainers, setTrainers] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -35,6 +36,7 @@ export default function Members() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [trainerId, setTrainerId] = useState('');
+  const [planId, setPlanId] = useState('');
   const [joinDate, setJoinDate] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
 
@@ -46,6 +48,12 @@ export default function Members() {
       ]);
       setMembers(membersRes.data.members || []);
       setTrainers(trainersRes.data.trainers || []);
+      try {
+        const plansRes = await api.get('/api/plans');
+        setPlans(plansRes.data.plans || []);
+      } catch (err) {
+        console.warn('Could not fetch plans:', err);
+      }
     } catch (err) {
       console.error('Fetch error:', err);
       setError('Failed to load members. Please try again.');
@@ -113,9 +121,10 @@ export default function Members() {
       await api.post('/api/members', {
         name: fullName, email, phone,
         trainer_id: trainerId || null,
+        plan_id: planId || null,
         join_date: joinDate, expiry_date: expiryDate,
       });
-      setFullName(''); setEmail(''); setPhone(''); setTrainerId('');
+      setFullName(''); setEmail(''); setPhone(''); setTrainerId(''); setPlanId('');
       setIsFormOpen(false); setCurrentPage(1);
       setActionSuccess(`${fullName} added successfully!`);
       setTimeout(() => setActionSuccess(null), 3000);
@@ -576,6 +585,22 @@ export default function Members() {
                       <option value="">Self-Trained</option>
                       {trainers.map(t => (
                         <option key={t.id} value={t.user_id}>{t.users?.name || 'Trainer'}</option>
+                      ))}
+                    </select>
+                    <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
+                  </div>
+                </div>
+                {/* Plan */}
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Select Plan</label>
+                  <div className="relative">
+                    <select
+                      value={planId} onChange={(e) => setPlanId(e.target.value)}
+                      className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
+                    >
+                      <option value="">No Plan Selected</option>
+                      {plans.map(p => (
+                        <option key={p.id} value={p.id}>{p.name} - ₹{p.price}/{p.duration}</option>
                       ))}
                     </select>
                     <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
