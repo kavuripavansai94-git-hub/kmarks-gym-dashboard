@@ -32,6 +32,7 @@ export default function Members() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editMemberId, setEditMemberId] = useState(null);
 
   // Form inputs
   const [fullName, setFullName] = useState('');
@@ -65,12 +66,37 @@ export default function Members() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   useEffect(() => {
-    if (isFormOpen) {
+    if (isFormOpen && !editMemberId) {
       const today = new Date().toISOString().split('T')[0];
       const ny = new Date(); ny.setFullYear(ny.getFullYear() + 1);
       setJoinDate(today); setExpiryDate(ny.toISOString().split('T')[0]);
     }
-  }, [isFormOpen]);
+  }, [isFormOpen, editMemberId]);
+
+  const openAddForm = () => {
+    setEditMemberId(null);
+    setFullName(''); setEmail(''); setPhone(''); setTrainerId(''); setPlanId('');
+    const today = new Date().toISOString().split('T')[0];
+    const ny = new Date(); ny.setFullYear(ny.getFullYear() + 1);
+    setJoinDate(today); setExpiryDate(ny.toISOString().split('T')[0]);
+    setIsFormOpen(true);
+    setActionError(null);
+  };
+
+  const openEditForm = (memberData) => {
+    const rawMember = members.find(m => m.id === memberData.id);
+    if (!rawMember) return;
+    setEditMemberId(rawMember.id);
+    setFullName(rawMember.users?.name || '');
+    setEmail(rawMember.users?.email || '');
+    setPhone(rawMember.users?.phone || '');
+    setTrainerId(rawMember.assigned_trainer_id || '');
+    setPlanId(rawMember.plan_id || '');
+    setJoinDate(rawMember.joined_at ? new Date(rawMember.joined_at).toISOString().split('T')[0] : '');
+    setExpiryDate(rawMember.membership_end ? new Date(rawMember.membership_end).toISOString().split('T')[0] : '');
+    setIsFormOpen(true);
+    setActionError(null);
+  };
 
   const computeStatus = (end) => {
     if (!end) return 'Active';
@@ -139,19 +165,26 @@ export default function Members() {
     e.preventDefault();
     try {
       setActionLoading(true); setActionError(null);
-      await api.post('/api/members', {
+      const payload = {
         name: fullName, email, phone,
         trainer_id: trainerId || null,
         plan_id: planId || null,
         join_date: joinDate, expiry_date: expiryDate,
-      });
-      setFullName(''); setEmail(''); setPhone(''); setTrainerId(''); setPlanId('');
-      setIsFormOpen(false); setCurrentPage(1);
-      setActionSuccess(`${fullName} added successfully!`);
+      };
+
+      if (editMemberId) {
+        await api.put(`/api/members/${editMemberId}`, payload);
+        setActionSuccess(`${fullName} updated successfully!`);
+      } else {
+        await api.post('/api/members', payload);
+        setActionSuccess(`${fullName} added successfully!`);
+      }
+      
+      setIsFormOpen(false); setEditMemberId(null); setCurrentPage(1);
       setTimeout(() => setActionSuccess(null), 3000);
       await fetchData();
     } catch (err) {
-      setActionError(err.response?.data?.error || 'Failed to add member.');
+      setActionError(err.response?.data?.error || `Failed to ${editMemberId ? 'update' : 'add'} member.`);
     } finally { setActionLoading(false); }
   };
 
@@ -235,7 +268,7 @@ export default function Members() {
           <div className="flex gap-sm">
             <button
               id="add-member-trigger"
-              onClick={() => setIsFormOpen(true)}
+              onClick={openAddForm}
               className="bg-primary-container text-on-primary font-label-bold text-[12px] px-md py-sm uppercase hover:brightness-110 active:scale-95 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] flex items-center gap-xs"
             >
               <span className="material-symbols-outlined text-[18px]">person_add</span>
@@ -336,10 +369,10 @@ export default function Members() {
               onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
               className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
             >
-              <option value="">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="expired">Expired</option>
-              <option value="expiring soon">Expiring Soon</option>
+              <option value="" className="bg-[#1A1A1A] text-white">All Statuses</option>
+              <option value="active" className="bg-[#1A1A1A] text-white">Active</option>
+              <option value="expired" className="bg-[#1A1A1A] text-white">Expired</option>
+              <option value="expiring soon" className="bg-[#1A1A1A] text-white">Expiring Soon</option>
             </select>
           </div>
           <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
@@ -348,9 +381,9 @@ export default function Members() {
               onChange={(e) => { setSelectedPlan(e.target.value); setCurrentPage(1); }}
               className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
             >
-              <option value="">All Plans</option>
+              <option value="" className="bg-[#1A1A1A] text-white">All Plans</option>
               {[...new Set(displayMembers.map(m => m.planName))].sort().map(name => (
-                <option key={name} value={name}>{name}</option>
+                <option key={name} value={name} className="bg-[#1A1A1A] text-white">{name}</option>
               ))}
             </select>
           </div>
@@ -360,9 +393,10 @@ export default function Members() {
               onChange={(e) => { setSelectedTrainer(e.target.value); setCurrentPage(1); }}
               className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
             >
-              <option value="">All Trainers</option>
+              <option value="" className="bg-[#1A1A1A] text-white">All Trainers</option>
+              <option value="Self-Trained" className="bg-[#1A1A1A] text-white">Self-Trained</option>
               {trainers.filter(t => t.users?.name).map(t => (
-                <option key={t.id} value={t.users.name}>{t.users.name}</option>
+                <option key={t.id} value={t.users.name} className="bg-[#1A1A1A] text-white">{t.users.name}</option>
               ))}
             </select>
           </div>
@@ -479,11 +513,19 @@ export default function Members() {
                       </span>
                     </td>
                     {/* Actions */}
-                    <td className="py-sm px-md text-right">
+                    <td className="py-sm px-md text-right whitespace-nowrap">
                       <button
-                        onClick={() => handleDelete(member.id, member.name)}
+                        onClick={(e) => { e.stopPropagation(); openEditForm(member); }}
                         disabled={actionLoading}
-                        className="w-8 h-8 flex items-center justify-center text-on-surface/20 hover:text-error hover:bg-error/10 transition-all disabled:opacity-30"
+                        className="w-8 h-8 inline-flex items-center justify-center text-on-surface/20 hover:text-primary-container hover:bg-primary-container/10 transition-all disabled:opacity-30 mr-1"
+                        title={`Edit ${member.name}`}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDelete(member.id, member.name); }}
+                        disabled={actionLoading}
+                        className="w-8 h-8 inline-flex items-center justify-center text-on-surface/20 hover:text-error hover:bg-error/10 transition-all disabled:opacity-30"
                         title={`Remove ${member.name}`}
                       >
                         <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -502,7 +544,7 @@ export default function Members() {
                       </p>
                       {!searchTerm && !selectedStatus && !selectedPlan && !selectedTrainer && (
                         <button
-                          onClick={() => setIsFormOpen(true)}
+                          onClick={openAddForm}
                           className="font-label-bold text-[10px] text-primary-container uppercase border-b border-primary-container/30 hover:border-primary-container transition-colors pb-[2px]"
                         >
                           Add your first member →
@@ -579,7 +621,9 @@ export default function Members() {
             <div className="p-md lg:px-lg lg:pt-lg flex justify-between items-start">
               <div>
                 <p className="font-label-bold text-[10px] text-primary-container uppercase tracking-[0.3em] mb-xs">New Registration</p>
-                <h2 className="font-headline-lg text-[24px] text-white uppercase tracking-tight leading-none">Add Member</h2>
+                <h2 className="font-headline-lg text-[24px] text-white uppercase tracking-tight leading-none">
+                  {editMemberId ? 'Edit Member' : 'Add Member'}
+                </h2>
               </div>
               <button
                 onClick={() => { setIsFormOpen(false); setActionError(null); }}
@@ -634,9 +678,9 @@ export default function Members() {
                       value={trainerId} onChange={(e) => setTrainerId(e.target.value)}
                       className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
                     >
-                      <option value="">Self-Trained</option>
+                      <option value="" className="bg-[#1A1A1A] text-white">Self-Trained</option>
                       {trainers.map(t => (
-                        <option key={t.id} value={t.user_id}>{t.users?.name || 'Trainer'}</option>
+                        <option key={t.id} value={t.user_id} className="bg-[#1A1A1A] text-white">{t.users?.name || 'Trainer'}</option>
                       ))}
                     </select>
                     <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
@@ -650,9 +694,9 @@ export default function Members() {
                       value={planId} onChange={(e) => setPlanId(e.target.value)}
                       className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
                     >
-                      <option value="">No Plan Selected</option>
+                      <option value="" className="bg-[#1A1A1A] text-white">No Plan Selected</option>
                       {plans.map(p => (
-                        <option key={p.id} value={p.id}>{p.name} - ₹{p.price}/{p.duration}</option>
+                        <option key={p.id} value={p.id} className="bg-[#1A1A1A] text-white">{p.name} - ₹{p.price}/{p.duration}</option>
                       ))}
                     </select>
                     <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
@@ -692,7 +736,7 @@ export default function Members() {
                   {actionLoading ? (
                     <><div className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></div> Adding...</>
                   ) : (
-                    <><span className="material-symbols-outlined text-[16px]">person_add</span> Add Member</>
+                    <><span className="material-symbols-outlined text-[16px]">{editMemberId ? 'save' : 'person_add'}</span> {editMemberId ? 'Save Changes' : 'Add Member'}</>
                   )}
                 </button>
               </div>
