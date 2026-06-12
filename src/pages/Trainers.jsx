@@ -33,6 +33,8 @@ export default function Trainers() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [specialty, setSpecialty] = useState('Weight Training');
+  const [joinedDate, setJoinedDate] = useState('');
+  const [certifications, setCertifications] = useState('');
 
   const fetchTrainers = useCallback(async () => {
     try {
@@ -79,14 +81,18 @@ export default function Trainers() {
     e.preventDefault();
     try {
       setActionLoading(true); setActionError(null);
+      const payload = {
+        name, email, phone, specialty,
+        joined_at: joinedDate, certifications: certifications || null
+      };
       if (editingTrainerId) {
-        await api.put(`/api/trainers/${editingTrainerId}`, { name, email, phone, specialty });
+        await api.put(`/api/trainers/${editingTrainerId}`, payload);
         setActionSuccess(`${name} updated successfully!`);
       } else {
-        await api.post('/api/trainers', { name, email, phone, specialty });
+        await api.post('/api/trainers', payload);
         setActionSuccess(`${name} added successfully!`);
       }
-      setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training');
+      setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training'); setJoinedDate(''); setCertifications('');
       setEditingTrainerId(null);
       setIsFormOpen(false);
       setTimeout(() => setActionSuccess(null), 3000);
@@ -101,6 +107,8 @@ export default function Trainers() {
     setEmail(trainer.email);
     setPhone(trainer.phone);
     setSpecialty(trainer.specialty);
+    setJoinedDate(trainer.joined_at ? new Date(trainer.joined_at).toISOString().split('T')[0] : '');
+    setCertifications(trainer.certifications || '');
     setEditingTrainerId(trainer.id);
     setIsFormOpen(true);
   };
@@ -118,8 +126,18 @@ export default function Trainers() {
     } finally { setActionLoading(false); }
   };
 
+  const openAddForm = () => {
+    setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training');
+    const today = new Date().toISOString().split('T')[0];
+    setJoinedDate(today); setCertifications('');
+    setEditingTrainerId(null);
+    setIsFormOpen(true);
+    setActionError(null);
+  };
+
   const handleCloseForm = () => {
     setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training');
+    setJoinedDate(''); setCertifications('');
     setEditingTrainerId(null);
     setIsFormOpen(false);
     setActionError(null);
@@ -191,7 +209,7 @@ export default function Trainers() {
           </div>
           <div className="flex gap-sm">
             <button
-              onClick={() => setIsFormOpen(true)}
+              onClick={openAddForm}
               className="bg-primary-container text-on-primary font-label-bold text-[12px] px-md py-sm uppercase hover:brightness-110 active:scale-95 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] flex items-center gap-xs"
             >
               <span className="material-symbols-outlined text-[18px]">person_add</span>
@@ -446,6 +464,21 @@ export default function Trainers() {
                     </select>
                     <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
                   </div>
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Joined Date *</label>
+                  <input
+                    type="date" value={joinedDate} onChange={(e) => setJoinedDate(e.target.value)} required
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
+                  />
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Certifications</label>
+                  <input
+                    type="text" placeholder="ACE, NASM, etc." value={certifications}
+                    onChange={(e) => setCertifications(e.target.value)}
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] placeholder:text-on-surface/20 focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
+                  />
                 </div>
               </div>
 

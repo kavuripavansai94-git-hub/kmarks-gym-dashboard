@@ -42,6 +42,10 @@ export default function Members() {
   const [planId, setPlanId] = useState('');
   const [joinDate, setJoinDate] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
+  const [gender, setGender] = useState('Male');
+  const [dob, setDob] = useState('');
+  const [emergencyContact, setEmergencyContact] = useState('');
+  const [medicalNotes, setMedicalNotes] = useState('');
 
   const fetchData = useCallback(async () => {
     try {
@@ -76,6 +80,7 @@ export default function Members() {
   const openAddForm = () => {
     setEditMemberId(null);
     setFullName(''); setEmail(''); setPhone(''); setTrainerId(''); setPlanId('');
+    setGender('Male'); setDob(''); setEmergencyContact(''); setMedicalNotes('');
     const today = new Date().toISOString().split('T')[0];
     const ny = new Date(); ny.setFullYear(ny.getFullYear() + 1);
     setJoinDate(today); setExpiryDate(ny.toISOString().split('T')[0]);
@@ -92,6 +97,10 @@ export default function Members() {
     setPhone(rawMember.users?.phone || '');
     setTrainerId(rawMember.assigned_trainer_id || '');
     setPlanId(rawMember.plan_id || '');
+    setGender(rawMember.gender || 'Male');
+    setDob(rawMember.date_of_birth ? new Date(rawMember.date_of_birth).toISOString().split('T')[0] : '');
+    setEmergencyContact(rawMember.emergency_contact || '');
+    setMedicalNotes(rawMember.medical_notes || '');
     setJoinDate(rawMember.joined_at ? new Date(rawMember.joined_at).toISOString().split('T')[0] : '');
     setExpiryDate(rawMember.membership_end ? new Date(rawMember.membership_end).toISOString().split('T')[0] : '');
     setIsFormOpen(true);
@@ -167,6 +176,9 @@ export default function Members() {
       setActionLoading(true); setActionError(null);
       const payload = {
         name: fullName, email, phone,
+        gender, date_of_birth: dob || null,
+        emergency_contact: emergencyContact || null,
+        medical_notes: medicalNotes || null,
         trainer_id: trainerId || null,
         plan_id: planId || null,
         join_date: joinDate, expiry_date: expiryDate,
@@ -720,6 +732,38 @@ export default function Members() {
                     className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] placeholder:text-on-surface/20 focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
                   />
                 </div>
+                {/* Gender */}
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Gender</label>
+                  <div className="relative">
+                    <select
+                      value={gender} onChange={(e) => setGender(e.target.value)}
+                      className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
+                    >
+                      <option value="Male" className="bg-[#1A1A1A] text-white">Male</option>
+                      <option value="Female" className="bg-[#1A1A1A] text-white">Female</option>
+                      <option value="Other" className="bg-[#1A1A1A] text-white">Other</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
+                  </div>
+                </div>
+                {/* Date of Birth */}
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Date of Birth</label>
+                  <input
+                    type="date" value={dob} onChange={(e) => setDob(e.target.value)}
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
+                  />
+                </div>
+                {/* Emergency Contact */}
+                <div className="flex flex-col gap-[6px] md:col-span-2 lg:col-span-1">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Emergency Contact</label>
+                  <input
+                    type="text" placeholder="Name & Phone Number" value={emergencyContact}
+                    onChange={(e) => setEmergencyContact(e.target.value)}
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] placeholder:text-on-surface/20 focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
+                  />
+                </div>
                 {/* Trainer */}
                 <div className="flex flex-col gap-[6px]">
                   <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Assign Trainer</label>
@@ -766,6 +810,15 @@ export default function Members() {
                   <input
                     type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} required
                     className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
+                  />
+                </div>
+                {/* Medical Notes */}
+                <div className="flex flex-col gap-[6px] md:col-span-2">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Medical Notes</label>
+                  <textarea
+                    placeholder="Any injuries, conditions or notes..." value={medicalNotes}
+                    onChange={(e) => setMedicalNotes(e.target.value)}
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] placeholder:text-on-surface/20 focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md min-h-[80px]"
                   />
                 </div>
               </div>

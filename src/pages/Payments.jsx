@@ -39,6 +39,7 @@ export default function Payments() {
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [upiRef, setUpiRef] = useState('');
   const [notes, setNotes] = useState('');
 
   const formatDDMMYYYY = (dateStr) => {
@@ -148,8 +149,9 @@ export default function Payments() {
         member_id: memberId, amount: parseFloat(amount),
         payment_method: paymentMethod, period_start: periodStart,
         period_end: periodEnd, due_date: dueDate, notes: notes || null,
+        transaction_id: paymentMethod === 'upi' && upiRef ? upiRef : undefined,
       });
-      setSelectedMemberId(''); setAmount(''); setPaymentMethod('cash'); setNotes(''); setDueDate('');
+      setSelectedMemberId(''); setAmount(''); setPaymentMethod('cash'); setNotes(''); setDueDate(''); setUpiRef('');
       setIsFormOpen(false); setCurrentPage(1);
       setActionSuccess('Payment recorded successfully.');
       setTimeout(() => setActionSuccess(null), 3000);
@@ -661,6 +663,17 @@ export default function Payments() {
                     <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
                   </div>
                 </div>
+
+                {paymentMethod === 'upi' && (
+                  <div className="flex flex-col gap-[6px]">
+                    <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">UPI Transaction ID</label>
+                    <input
+                      type="text" placeholder="e.g. 4158XXXXXXXX" value={upiRef}
+                      onChange={(e) => setUpiRef(e.target.value)}
+                      className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] placeholder:text-on-surface/20 focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
+                    />
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-[6px]">
                   <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Due Date</label>
