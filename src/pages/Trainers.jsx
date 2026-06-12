@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 // Animated counter
@@ -14,7 +15,9 @@ function AnimCount({ value, dur = 600 }) {
 }
 
 export default function Trainers() {
+  const navigate = useNavigate();
   const [trainers, setTrainers] = useState([]);
+  const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -23,6 +26,7 @@ export default function Trainers() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTrainerId, setEditingTrainerId] = useState(null);
 
   // Form states
   const [name, setName] = useState('');
@@ -33,8 +37,12 @@ export default function Trainers() {
   const fetchTrainers = useCallback(async () => {
     try {
       setLoading(true); setError(null);
-      const res = await api.get('/api/trainers');
-      setTrainers(res.data.trainers || []);
+      const [trainersRes, membersRes] = await Promise.all([
+        api.get('/api/trainers'),
+        api.get('/api/members')
+      ]);
+      setTrainers(trainersRes.data.trainers || []);
+      setMembers(membersRes.data.members || []);
     } catch (err) {
       console.error('Failed to fetch trainers:', err);
       setError('Failed to load trainers. Please try again.');
@@ -48,13 +56,16 @@ export default function Trainers() {
 
   const displayTrainers = trainers.map((t) => {
     const user = t.users || {};
+    const assignedCount = members.filter(m => m.assigned_trainer_id === t.user_id).length;
     return {
       id: t.id,
+      user_id: t.user_id,
       name: user.name || 'Unknown',
       email: user.email || '',
       phone: user.phone || '-',
       specialty: t.specialization || '-',
-      joinedDate: t.created_at ? new Date(t.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }) : '-',
+      joinedDate: t.created_at ? new Date(t.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : '-',
+      assignedCount
     };
   });
 
@@ -67,15 +78,50 @@ export default function Trainers() {
     e.preventDefault();
     try {
       setActionLoading(true); setActionError(null);
-      await api.post('/api/trainers', { name, email, phone, specialty });
+      if (editingTrainerId) {
+        await api.put(`/api/trainers/${editingTrainerId}`, { name, email, phone, specialty });
+        setActionSuccess(`${name} updated successfully!`);
+      } else {
+        await api.post('/api/trainers', { name, email, phone, specialty });
+        setActionSuccess(`${name} added successfully!`);
+      }
       setName(''); setEmail(''); setPhone(''); setSpecialty('Bodybuilding');
+      setEditingTrainerId(null);
       setIsFormOpen(false);
-      setActionSuccess(`${name} added successfully!`);
       setTimeout(() => setActionSuccess(null), 3000);
       await fetchTrainers();
     } catch (err) {
-      setActionError(err.response?.data?.error || 'Failed to add trainer.');
+      setActionError(err.response?.data?.error || `Failed to ${editingTrainerId ? 'update' : 'add'} trainer.`);
     } finally { setActionLoading(false); }
+  };
+
+  const handleEditClick = (trainer) => {
+    setName(trainer.name);
+    setEmail(trainer.email);
+    setPhone(trainer.phone);
+    setSpecialty(trainer.specialty);
+    setEditingTrainerId(trainer.id);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = async (trainerId, trainerName) => {
+    if (!window.confirm(`Are you sure you want to remove trainer ${trainerName}? This will also delete their login account.`)) return;
+    try {
+      setActionLoading(true); setActionError(null);
+      await api.delete(`/api/trainers/${trainerId}`);
+      setActionSuccess(`${trainerName} has been removed.`);
+      setTimeout(() => setActionSuccess(null), 3000);
+      await fetchTrainers();
+    } catch (err) {
+      setActionError(err.response?.data?.error || 'Failed to delete trainer.');
+    } finally { setActionLoading(false); }
+  };
+
+  const handleCloseForm = () => {
+    setName(''); setEmail(''); setPhone(''); setSpecialty('Bodybuilding');
+    setEditingTrainerId(null);
+    setIsFormOpen(false);
+    setActionError(null);
   };
 
   // Loading
@@ -234,12 +280,18 @@ export default function Trainers() {
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Trainer</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden md:table-cell">Phone</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Specialty</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider text-center hidden md:table-cell">Members Assigned</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Joined</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider text-right w-24">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredTrainers.map((trainer, idx) => (
-                <tr key={trainer.id} className={`group hover:bg-white/[0.02] transition-colors ${idx < filteredTrainers.length - 1 ? 'border-b border-white/[0.03]' : ''}`}>
+                <tr 
+                  key={trainer.id} 
+                  onClick={() => navigate(`/trainers/${trainer.id}`)}
+                  className={`group hover:bg-white/[0.02] cursor-pointer transition-colors ${idx < filteredTrainers.length - 1 ? 'border-b border-white/[0.03]' : ''}`}
+                >
                   <td className="py-sm px-md">
                     <div className="flex items-center gap-sm">
                       <div className="w-10 h-10 bg-gradient-to-br from-primary-container/20 to-primary-container/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:border-primary-container/40 transition-colors">
@@ -257,12 +309,37 @@ export default function Trainers() {
                       {trainer.specialty}
                     </span>
                   </td>
+                  <td className="py-sm px-md font-body-md text-[13px] font-bold text-center text-white hidden md:table-cell">
+                    <span className="bg-primary-container/10 text-primary-container border border-primary-container/20 px-sm py-[3px] font-label-bold text-[10px]">
+                      {trainer.assignedCount}
+                    </span>
+                  </td>
                   <td className="py-sm px-md font-body-md text-[12px] text-on-surface/35 hidden lg:table-cell">{trainer.joinedDate}</td>
+                  <td className="py-sm px-md text-right">
+                    <div className="flex justify-end gap-xs">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleEditClick(trainer); }}
+                        disabled={actionLoading}
+                        className="w-8 h-8 flex items-center justify-center text-on-surface/20 hover:text-primary-container hover:bg-primary-container/10 transition-all disabled:opacity-30"
+                        title={`Edit ${trainer.name}`}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDelete(trainer.id, trainer.name); }}
+                        disabled={actionLoading}
+                        className="w-8 h-8 flex items-center justify-center text-on-surface/20 hover:text-error hover:bg-error/10 transition-all disabled:opacity-30"
+                        title={`Delete ${trainer.name}`}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
               {filteredTrainers.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="py-xl text-center">
+                  <td colSpan="6" className="py-xl text-center">
                     <div className="flex flex-col items-center gap-sm">
                       <span className="material-symbols-outlined text-on-surface/15 text-[40px]">search_off</span>
                       <p className="font-label-bold text-[11px] text-on-surface/25 uppercase tracking-wider">
@@ -277,19 +354,23 @@ export default function Trainers() {
         </div>
       </div>
 
-      {/* ─── Add Trainer Modal ─── */}
+      {/* ─── Add/Edit Trainer Modal ─── */}
       {isFormOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-margin-mobile" onClick={(e) => { if (e.target === e.currentTarget) { setIsFormOpen(false); setActionError(null); } }}>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-margin-mobile" onClick={(e) => { if (e.target === e.currentTarget) { handleCloseForm(); } }}>
           <div className="bg-surface-container border border-white/10 w-full max-w-2xl relative overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
             <div className="h-[2px] bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
 
             <div className="p-md lg:px-lg lg:pt-lg flex justify-between items-start">
               <div>
-                <p className="font-label-bold text-[10px] text-primary-container uppercase tracking-[0.3em] mb-xs">Staff Onboarding</p>
-                <h2 className="font-headline-lg text-[24px] text-white uppercase tracking-tight leading-none">Add Trainer</h2>
+                <p className="font-label-bold text-[10px] text-primary-container uppercase tracking-[0.3em] mb-xs">
+                  {editingTrainerId ? 'Staff Update' : 'Staff Onboarding'}
+                </p>
+                <h2 className="font-headline-lg text-[24px] text-white uppercase tracking-tight leading-none">
+                  {editingTrainerId ? 'Edit Trainer' : 'Add Trainer'}
+                </h2>
               </div>
               <button
-                onClick={() => { setIsFormOpen(false); setActionError(null); }}
+                onClick={handleCloseForm}
                 className="w-8 h-8 flex items-center justify-center text-on-surface/30 hover:text-white hover:bg-white/5 transition-all"
               >
                 <span className="material-symbols-outlined text-[22px]">close</span>
@@ -350,7 +431,7 @@ export default function Trainers() {
 
               <div className="pt-md border-t border-white/[0.06] flex gap-sm justify-end">
                 <button
-                  type="button" onClick={() => { setIsFormOpen(false); setActionError(null); }}
+                  type="button" onClick={handleCloseForm}
                   className="px-md py-sm border border-white/10 font-label-bold text-[11px] uppercase text-on-surface/50 hover:text-white hover:border-white/30 transition-all active:scale-95"
                 >
                   Cancel
@@ -360,9 +441,9 @@ export default function Trainers() {
                   className="px-md py-sm bg-primary-container text-on-primary font-label-bold text-[11px] uppercase hover:brightness-110 transition-all active:scale-95 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] disabled:opacity-50 flex items-center gap-xs"
                 >
                   {actionLoading ? (
-                    <><div className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></div> Adding...</>
+                    <><div className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></div> {editingTrainerId ? 'Saving...' : 'Adding...'}</>
                   ) : (
-                    <><span className="material-symbols-outlined text-[16px]">person_add</span> Add Trainer</>
+                    <><span className="material-symbols-outlined text-[16px]">{editingTrainerId ? 'save' : 'person_add'}</span> {editingTrainerId ? 'Save Changes' : 'Add Trainer'}</>
                   )}
                 </button>
               </div>

@@ -11,6 +11,7 @@ import Payments from './pages/Payments';
 import Attendance from './pages/Attendance';
 import Announcements from './pages/Announcements';
 import MemberProfile from './pages/MemberProfile';
+import TrainerProfile from './pages/TrainerProfile';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 
@@ -62,6 +63,7 @@ export default function App() {
           <Route path="members" element={<Members />} />
           <Route path="members/:id" element={<MemberProfile />} />
           <Route path="trainers" element={<Trainers />} />
+          <Route path="trainers/:id" element={<TrainerProfile />} />
           <Route path="payments" element={<Payments />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="announcements" element={<Announcements />} />
