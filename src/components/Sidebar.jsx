@@ -24,9 +24,14 @@ export default function Sidebar() {
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col py-lg z-50">
       {/* Branding */}
-      <div className="px-md mb-xl">
-        <h1 className="font-headline-md text-headline-md font-bold text-primary-container tracking-tighter uppercase">K MARK'S</h1>
-        <p className="font-label-bold text-[10px] text-outline tracking-[0.2em] uppercase">PERFORMANCE GYM</p>
+      <div className="px-md mb-xl flex justify-center">
+        <div className="bg-transparent" style={{ padding: '8px 16px', borderRadius: '8px' }}>
+          <img 
+            src="/kmarks-logo.png" 
+            style={{ width: '150px', height: '70px', objectFit: 'contain' }} 
+            alt="K Mark's Gym Logo" 
+          />
+        </div>
       </div>
 
       {/* Navigation List */}

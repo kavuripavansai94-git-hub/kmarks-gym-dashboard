@@ -129,8 +129,9 @@ export default function Payments() {
   const handleUpdateStatus = async (paymentId, newStatus) => {
     try {
       setActionLoading(true); setActionError(null);
-      await api.put(`/api/payments/${paymentId}`, { status: newStatus });
-      setActionSuccess('Payment status updated.');
+      const todayDate = new Date().toISOString().split('T')[0];
+      await api.put(`/api/payments/${paymentId}`, { status: newStatus, paid_date: todayDate });
+      setActionSuccess('Payment marked as paid.');
       setTimeout(() => setActionSuccess(null), 3000);
       await fetchData();
     } catch (err) {

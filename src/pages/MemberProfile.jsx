@@ -29,6 +29,28 @@ export default function MemberProfile() {
   const [progress, setProgress] = useState([]);
   
   const [activeTab, setActiveTab] = useState('workout');
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState(null);
+  const [actionSuccess, setActionSuccess] = useState(null);
+
+  const handleUpdatePaymentStatus = async (paymentId) => {
+    try {
+      setActionLoading(true);
+      setActionError(null);
+      const todayDate = new Date().toISOString().split('T')[0];
+      await api.put(`/api/payments/${paymentId}`, {
+        status: 'completed',
+        paid_date: todayDate
+      });
+      setActionSuccess('Payment marked as paid.');
+      setTimeout(() => setActionSuccess(null), 3000);
+      await fetchData();
+    } catch (err) {
+      setActionError(err.response?.data?.error || 'Failed to update payment status.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -118,6 +140,26 @@ export default function MemberProfile() {
 
   return (
     <div className="space-y-md lg:space-y-lg relative">
+      {/* ─── Notification Toasts ─── */}
+      {actionError && (
+        <div className="bg-error/10 border border-error/30 text-error px-md py-sm font-label-bold text-[11px] uppercase flex justify-between items-center animate-[slideDown_0.3s_ease]">
+          <div className="flex items-center gap-sm">
+            <span className="material-symbols-outlined text-[16px]">error</span>
+            <span>{actionError}</span>
+          </div>
+          <button onClick={() => setActionError(null)} className="material-symbols-outlined text-[16px] hover:text-white transition-colors">close</button>
+        </div>
+      )}
+      {actionSuccess && (
+        <div className="bg-green-500/10 border border-green-500/30 text-green-500 px-md py-sm font-label-bold text-[11px] uppercase flex justify-between items-center animate-[slideDown_0.3s_ease]">
+          <div className="flex items-center gap-sm">
+            <span className="material-symbols-outlined text-[16px]">check_circle</span>
+            <span>{actionSuccess}</span>
+          </div>
+          <button onClick={() => setActionSuccess(null)} className="material-symbols-outlined text-[16px] hover:text-white transition-colors">close</button>
+        </div>
+      )}
+
       {/* ─── Back Button ─── */}
       <button 
         onClick={() => navigate('/members')}
@@ -351,12 +393,19 @@ export default function MemberProfile() {
                                 statusStr === 'failed' ? 'bg-error/10 text-error border border-error/20' : 
                                 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
                               }`}>
-                                {statusStr}
+                                <span className={`w-[5px] h-[5px] rounded-full ${
+                                  statusStr === 'completed' || statusStr === 'paid' ? 'bg-green-500' : statusStr === 'failed' ? 'bg-error' : 'bg-yellow-500'
+                                }`}></span>
+                                {statusStr === 'completed' || statusStr === 'paid' ? 'PAID' : statusStr}
                               </span>
                             </td>
                             <td className="py-sm px-md text-right">
                               {isPending && (
-                                <button className="font-label-bold text-[10px] text-white border-b border-white/30 hover:text-green-500 hover:border-green-500 pb-[2px] transition-colors uppercase">
+                                <button
+                                  onClick={() => handleUpdatePaymentStatus(p.id)}
+                                  disabled={actionLoading}
+                                  className="font-label-bold text-[10px] text-white border-b border-white/30 hover:text-green-500 hover:border-green-500 pb-[2px] transition-colors uppercase disabled:opacity-30"
+                                >
                                   Mark as Paid
                                 </button>
                               )}

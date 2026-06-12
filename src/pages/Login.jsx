@@ -29,19 +29,7 @@ export default function Login() {
         
         {/* Logo and Header */}
         <div className="flex flex-col items-center mb-lg">
-          {/* Custom SVG Gym Logo */}
-          <svg className="w-20 h-20 mb-md" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="15" y="45" width="70" height="10" fill="#F5C200" />
-            {/* Dumbbell plates */}
-            <rect x="15" y="25" width="10" height="50" rx="2" fill="#FFFFFF" />
-            <rect x="5" y="30" width="10" height="40" rx="2" fill="#F5C200" />
-            <rect x="75" y="25" width="10" height="50" rx="2" fill="#FFFFFF" />
-            <rect x="85" y="30" width="10" height="40" rx="2" fill="#F5C200" />
-            {/* Logo text K M */}
-            <text x="50" y="52" fill="#1A1A1A" fontSize="11" fontFamily="Oswald" fontWeight="bold" textAnchor="middle">K MARK</text>
-          </svg>
-          <h1 className="font-headline-lg text-[32px] font-bold text-white uppercase tracking-tight">IRON ADMIN</h1>
-          <p className="font-label-bold text-label-sm text-outline uppercase tracking-wider">K Mark's Gym Portal</p>
+          <img src="/kmarks-logo.png" style={{ width: '200px', height: 'auto', marginBottom: '16px' }} alt="K Mark's Gym Logo" />
         </div>
 
         {/* Credentials Form */}
