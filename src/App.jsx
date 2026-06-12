@@ -11,6 +11,7 @@ import Payments from './pages/Payments';
 import Attendance from './pages/Attendance';
 import Announcements from './pages/Announcements';
 import MemberProfile from './pages/MemberProfile';
+import Analytics from './pages/Analytics';
 
 // Layout wrapper for all authenticated dashboard pages
 function DashboardLayout() {
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="payments" element={<Payments />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="announcements" element={<Announcements />} />
+          <Route path="analytics" element={<Analytics />} />
         </Route>
 
         {/* Fallback Catch-all Route */}

@@ -18,6 +18,7 @@ export default function Sidebar() {
     { path: '/payments', name: 'Payments', icon: 'payments' },
     { path: '/attendance', name: 'Attendance', icon: 'calendar_today' },
     { path: '/announcements', name: 'Announcements', icon: 'campaign' },
+    { path: '/analytics', name: 'Analytics', icon: 'bar_chart' },
   ];
 
   return (
