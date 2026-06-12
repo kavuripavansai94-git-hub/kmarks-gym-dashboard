@@ -193,7 +193,7 @@ export default function TrainerProfile() {
             onClick={async () => {
               if (window.confirm('Are you sure you want to delete this trainer?')) {
                 try {
-                  await api.delete(`/api/trainers/${trainer.id}`);
+                  await api.delete(`/api/trainers/${id}`);
                   navigate('/trainers');
                 } catch(e) {
                   window.alert('Failed to delete trainer');

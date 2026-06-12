@@ -266,10 +266,12 @@ export default function MemberProfile() {
             onClick={async () => {
               if (window.confirm('Are you sure you want to delete this member?')) {
                 try {
-                  await api.delete(`/api/members/${member.id}`);
+                  setActionLoading(true);
+                  await api.delete(`/api/members/${id}`);
                   navigate('/members');
                 } catch(e) {
                   setActionError('Failed to delete member');
+                  setActionLoading(false);
                 }
               }
             }}
