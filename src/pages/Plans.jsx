@@ -422,54 +422,62 @@ export default function Plans() {
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-sm">
         {/* KPI 1 */}
         <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-4 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-            <span className="material-symbols-outlined text-[80px]">card_membership</span>
+          <div className="absolute -right-4 -bottom-6 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.03 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '90px', lineHeight: '1' }}>card_membership</span>
           </div>
-          <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Total Packages</p>
-          <div className="flex items-baseline gap-xs">
-            <h3 className="font-headline-lg text-[32px] text-white leading-none font-bold">
-              {loading ? '...' : stats.totalPackages}
-            </h3>
+          <div className="relative z-10">
+            <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Total Packages</p>
+            <div className="flex items-baseline gap-xs">
+              <h3 className="font-headline-lg text-[32px] text-white leading-none font-bold">
+                {loading ? '...' : stats.totalPackages}
+              </h3>
+            </div>
           </div>
         </div>
 
         {/* KPI 2 */}
         <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-4 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-            <span className="material-symbols-outlined text-[80px]">trending_up</span>
+          <div className="absolute -right-4 -bottom-6 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.03 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '90px', lineHeight: '1' }}>trending_up</span>
           </div>
-          <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Most Popular</p>
-          <div className="flex items-baseline gap-xs">
-            <h3 className="font-headline-md text-[18px] lg:text-[20px] text-primary-container leading-none font-bold uppercase truncate max-w-full">
-              {loading ? '...' : stats.popularPlanName}
-            </h3>
+          <div className="relative z-10">
+            <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Most Popular</p>
+            <div className="flex items-baseline gap-xs">
+              <h3 className="font-headline-md text-[18px] lg:text-[20px] text-primary-container leading-none font-bold uppercase truncate max-w-full">
+                {loading ? '...' : stats.popularPlanName}
+              </h3>
+            </div>
           </div>
         </div>
 
         {/* KPI 3 */}
         <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-4 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-            <span className="material-symbols-outlined text-[80px]">group</span>
+          <div className="absolute -right-4 -bottom-6 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.03 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '90px', lineHeight: '1' }}>group</span>
           </div>
-          <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Subscribed Members</p>
-          <div className="flex items-baseline gap-xs">
-            <h3 className="font-headline-lg text-[32px] text-white leading-none font-bold">
-              {loading ? '...' : stats.totalSubscribed}
-            </h3>
-            <span className="text-[11px] text-on-surface/30 uppercase font-label-bold">Active</span>
+          <div className="relative z-10">
+            <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Subscribed Members</p>
+            <div className="flex items-baseline gap-xs">
+              <h3 className="font-headline-lg text-[32px] text-white leading-none font-bold">
+                {loading ? '...' : stats.totalSubscribed}
+              </h3>
+              <span className="text-[11px] text-on-surface/30 uppercase font-label-bold ml-xs">Active</span>
+            </div>
           </div>
         </div>
 
         {/* KPI 4 */}
         <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-4 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-            <span className="material-symbols-outlined text-[80px]">payments</span>
+          <div className="absolute -right-4 -bottom-6 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.03 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '90px', lineHeight: '1' }}>payments</span>
           </div>
-          <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Avg Plan Price</p>
-          <div className="flex items-baseline gap-xs">
-            <h3 className="font-headline-lg text-[28px] text-white leading-none font-bold">
-              {loading ? '...' : formatINR(stats.avgPrice)}
-            </h3>
+          <div className="relative z-10">
+            <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Avg Plan Price</p>
+            <div className="flex items-baseline gap-xs">
+              <h3 className="font-headline-lg text-[28px] text-white leading-none font-bold">
+                {loading ? '...' : formatINR(stats.avgPrice)}
+              </h3>
+            </div>
           </div>
         </div>
       </section>
