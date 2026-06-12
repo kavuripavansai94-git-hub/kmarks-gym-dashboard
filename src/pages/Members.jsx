@@ -367,7 +367,7 @@ export default function Members() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-green-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-green-500/10 group-hover:drop-shadow-[0_0_15px_rgba(34,197,94,0.4)] transition-all duration-500 pointer-events-none">
             <span className="material-symbols-outlined text-[64px] leading-none block">check_circle</span>
           </div>
           <div className="flex items-center justify-between relative z-10">
@@ -387,7 +387,7 @@ export default function Members() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-yellow-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-yellow-500/10 group-hover:drop-shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all duration-500 pointer-events-none">
             <span className="material-symbols-outlined text-[64px] leading-none block">schedule</span>
           </div>
           <div className="flex items-center justify-between relative z-10">
@@ -407,7 +407,7 @@ export default function Members() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-error scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-error/10 group-hover:drop-shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all duration-500 pointer-events-none">
             <span className="material-symbols-outlined text-[64px] leading-none block">cancel</span>
           </div>
           <div className="flex items-center justify-between relative z-10">

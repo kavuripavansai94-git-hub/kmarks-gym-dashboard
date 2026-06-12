@@ -400,7 +400,7 @@ export default function DashboardHome() {
             <div className="group relative bg-surface-container border border-white/[0.06] p-md hover:border-primary-container/50 transition-all duration-300 cursor-pointer overflow-hidden"
               onClick={() => navigate('/members')}
             >
-              <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+              <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all duration-500 pointer-events-none">
                 <span className="material-symbols-outlined text-[64px] leading-none block">group</span>
               </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
@@ -423,7 +423,7 @@ export default function DashboardHome() {
 
             {/* Active Today */}
             <div className="group relative bg-surface-container border border-white/[0.06] p-md transition-all duration-300 overflow-hidden">
-              <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+              <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all duration-500 pointer-events-none">
                 <span className="material-symbols-outlined text-[64px] leading-none block">bolt</span>
               </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
@@ -449,7 +449,9 @@ export default function DashboardHome() {
             }`}
               onClick={() => navigate('/payments')}
             >
-              <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+              <div className={`absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-all duration-500 pointer-events-none ${
+                overduePayments > 0 ? 'group-hover:text-error/10 group-hover:drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'group-hover:text-white/[0.05] group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]'
+              }`}>
                 <span className="material-symbols-outlined text-[64px] leading-none block">warning</span>
               </div>
               <div className={`absolute top-0 left-0 w-full h-[2px] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${
@@ -482,7 +484,7 @@ export default function DashboardHome() {
             <div className="group relative bg-surface-container border border-white/[0.06] p-md hover:border-yellow-500/40 transition-all duration-300 cursor-pointer overflow-hidden"
               onClick={() => navigate('/members')}
             >
-              <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+              <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-yellow-500/10 group-hover:drop-shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all duration-500 pointer-events-none">
                 <span className="material-symbols-outlined text-[64px] leading-none block">schedule</span>
               </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-yellow-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>

@@ -422,7 +422,7 @@ export default function Plans() {
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-sm">
         {/* KPI 1 */}
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all duration-500 pointer-events-none">
             <span className="material-symbols-outlined text-[64px] leading-none block">account_balance_wallet</span>
           </div>
           <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Total Packages</p>
@@ -435,7 +435,7 @@ export default function Plans() {
 
         {/* KPI 2 */}
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all duration-500 pointer-events-none">
             <span className="material-symbols-outlined text-[64px] leading-none block">shopping_cart_checkout</span>
           </div>
           <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Most Popular</p>
@@ -448,7 +448,7 @@ export default function Plans() {
 
         {/* KPI 3 */}
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all duration-500 pointer-events-none">
             <span className="material-symbols-outlined text-[64px] leading-none block">category</span>
           </div>
           <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Subscribed Members</p>
