@@ -422,8 +422,8 @@ export default function Plans() {
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-sm">
         {/* KPI 1 */}
         <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-6 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.03 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '90px', lineHeight: '1' }}>card_membership</span>
+          <div className="absolute right-1 bottom-1 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.08 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '80px', lineHeight: '1' }}>card_membership</span>
           </div>
           <div className="relative z-10">
             <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Total Packages</p>
@@ -437,8 +437,8 @@ export default function Plans() {
 
         {/* KPI 2 */}
         <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-6 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.03 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '90px', lineHeight: '1' }}>trending_up</span>
+          <div className="absolute right-1 bottom-1 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.08 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '80px', lineHeight: '1' }}>trending_up</span>
           </div>
           <div className="relative z-10">
             <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Most Popular</p>
@@ -452,8 +452,8 @@ export default function Plans() {
 
         {/* KPI 3 */}
         <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-6 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.03 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '90px', lineHeight: '1' }}>group</span>
+          <div className="absolute right-1 bottom-1 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.08 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '80px', lineHeight: '1' }}>group</span>
           </div>
           <div className="relative z-10">
             <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Subscribed Members</p>
@@ -468,8 +468,8 @@ export default function Plans() {
 
         {/* KPI 4 */}
         <div className="bg-surface-container border border-white/[0.06] p-md relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-6 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.03 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '90px', lineHeight: '1' }}>payments</span>
+          <div className="absolute right-1 bottom-1 select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none z-0" style={{ opacity: 0.08 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '80px', lineHeight: '1' }}>payments</span>
           </div>
           <div className="relative z-10">
             <p className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider mb-sm">Avg Plan Price</p>
