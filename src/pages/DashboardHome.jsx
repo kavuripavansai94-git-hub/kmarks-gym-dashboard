@@ -400,8 +400,8 @@ export default function DashboardHome() {
             <div className="group relative bg-surface-container border border-white/[0.06] p-md hover:border-primary-container/50 transition-all duration-300 cursor-pointer overflow-hidden"
               onClick={() => navigate('/members')}
             >
-              <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-                <span className="material-symbols-outlined text-[80px]">group</span>
+              <div className="absolute right-4 top-4 text-white/[0.02] text-[64px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                <span className="material-symbols-outlined text-[64px]">group</span>
               </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
               <div className="flex items-start justify-between mb-sm relative z-10">
@@ -412,7 +412,7 @@ export default function DashboardHome() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-sm">
+              <div className="flex items-center justify-between mt-sm relative z-10">
                 <SparkBars data={memberWeekData} height={24} />
                 <span className="font-label-bold text-[10px] text-green-500 uppercase flex items-center gap-[2px]">
                   <span className="material-symbols-outlined text-[14px]">trending_up</span>
@@ -423,8 +423,8 @@ export default function DashboardHome() {
 
             {/* Active Today */}
             <div className="group relative bg-surface-container border border-white/[0.06] p-md transition-all duration-300 overflow-hidden">
-              <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-                <span className="material-symbols-outlined text-[80px]">bolt</span>
+              <div className="absolute right-4 top-4 text-white/[0.02] text-[64px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                <span className="material-symbols-outlined text-[64px]">bolt</span>
               </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
               <div className="flex items-start justify-between mb-sm relative z-10">
@@ -435,7 +435,7 @@ export default function DashboardHome() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-sm">
+              <div className="flex items-center justify-between mt-sm relative z-10">
                 <SparkBars data={attendanceWeekData} color="#4ade80" height={24} />
                 <span className="font-label-bold text-[10px] text-on-surface/40 uppercase">
                   {Math.round((activeToday / Math.max(totalMembers, 1)) * 100)}% rate
@@ -449,8 +449,8 @@ export default function DashboardHome() {
             }`}
               onClick={() => navigate('/payments')}
             >
-              <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-                <span className="material-symbols-outlined text-[80px]">warning</span>
+              <div className="absolute right-4 top-4 text-white/[0.02] text-[64px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                <span className="material-symbols-outlined text-[64px]">warning</span>
               </div>
               <div className={`absolute top-0 left-0 w-full h-[2px] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${
                 overduePayments > 0 ? 'bg-error' : 'bg-primary-container'
@@ -466,7 +466,7 @@ export default function DashboardHome() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-sm">
+              <div className="flex items-center justify-between mt-sm relative z-10">
                 <div className="flex gap-[3px]">
                   {[...Array(7)].map((_, i) => (
                     <div key={i} className={`w-[6px] h-[6px] rounded-[1px] ${i < overduePayments ? 'bg-error/80' : 'bg-white/10'}`}></div>
@@ -482,8 +482,8 @@ export default function DashboardHome() {
             <div className="group relative bg-surface-container border border-white/[0.06] p-md hover:border-yellow-500/40 transition-all duration-300 cursor-pointer overflow-hidden"
               onClick={() => navigate('/members')}
             >
-              <div className="absolute right-0 bottom-0 text-white/[0.02] text-[80px] font-bold select-none group-hover:scale-110 transition-transform duration-500">
-                <span className="material-symbols-outlined text-[80px]">schedule</span>
+              <div className="absolute right-4 top-4 text-white/[0.02] text-[64px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                <span className="material-symbols-outlined text-[64px]">schedule</span>
               </div>
               <div className="absolute top-0 left-0 w-full h-[2px] bg-yellow-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
               <div className="flex items-start justify-between mb-sm relative z-10">
@@ -496,7 +496,7 @@ export default function DashboardHome() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-sm">
+              <div className="flex items-center justify-between mt-sm relative z-10">
                 <div className="h-1 flex-grow bg-white/5 mr-md overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-yellow-500/60 to-yellow-500 transition-all duration-1000"
