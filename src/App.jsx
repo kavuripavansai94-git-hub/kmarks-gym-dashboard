@@ -14,6 +14,8 @@ import TrainerProfile from './pages/TrainerProfile';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import Plans from './pages/Plans';
+import Enquiries from './pages/Enquiries';
+import Expenses from './pages/Expenses';
 
 // Layout wrapper for all authenticated dashboard pages
 function DashboardLayout() {
@@ -69,6 +71,8 @@ export default function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="plans" element={<Plans />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="enquiries" element={<Enquiries />} />
+          <Route path="expenses" element={<Expenses />} />
         </Route>
 
         {/* Fallback Catch-all Route */}

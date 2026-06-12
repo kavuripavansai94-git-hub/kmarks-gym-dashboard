@@ -17,6 +17,8 @@ export default function Sidebar() {
     { path: '/trainers', name: 'Trainers', icon: 'fitness_center' },
     { path: '/payments', name: 'Payments', icon: 'payments' },
     { path: '/plans', name: 'Plans & Packages', icon: 'card_membership' },
+    { path: '/enquiries', name: 'Enquiries / Leads', icon: 'contact_phone' },
+    { path: '/expenses', name: 'Expenses Tracker', icon: 'receipt_long' },
     { path: '/announcements', name: 'Announcements', icon: 'campaign' },
     { path: '/analytics', name: 'Analytics', icon: 'bar_chart' },
   ];
