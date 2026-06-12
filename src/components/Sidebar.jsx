@@ -22,20 +22,19 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col py-lg z-50">
+    <aside className="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col pb-lg z-50">
       {/* Branding */}
-      <div className="px-md mb-xl flex justify-center">
-        <div className="bg-transparent" style={{ padding: '8px 16px', borderRadius: '8px' }}>
-          <img 
-            src="/kmarks-logo.png" 
-            style={{ width: '150px', height: '70px', objectFit: 'contain' }} 
-            alt="K Mark's Gym Logo" 
-          />
-        </div>
+      <div style={{ width: '100%', padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <img 
+          src="/kmarks-logo.png" 
+          style={{ width: '100%', maxWidth: '180px', height: 'auto', marginBottom: '8px' }} 
+          alt="K Mark's Gym Logo" 
+        />
+        <div style={{ width: '100%', height: '1px', backgroundColor: '#F5C200' }}></div>
       </div>
 
       {/* Navigation List */}
-      <nav className="flex-grow space-y-2">
+      <nav className="flex-grow space-y-2 mt-md">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
