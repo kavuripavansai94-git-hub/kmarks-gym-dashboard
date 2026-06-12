@@ -108,6 +108,21 @@ export default function DashboardHome() {
     return data;
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr || dateStr === 'N/A') return 'N/A';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('en-IN', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric' 
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
   // Fetch all dashboard data in parallel
   const fetchData = async () => {
     setLoading(true);
@@ -147,7 +162,7 @@ export default function DashboardHome() {
         email: member.users?.email || "",
         plan: getPlanName(member),
         trainer: trainersMap[member.assigned_trainer_id] || "Self-Trained",
-        joinDate: member.joined_at || "N/A",
+        joinDate: formatDate(member.joined_at),
         status: getMemberStatus(member)
       }));
       setRecentMembers(parsedRecent);

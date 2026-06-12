@@ -87,13 +87,30 @@ export default function Members() {
     return Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr || dateStr === '-') return '-';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('en-IN', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric' 
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
   const displayMembers = members.map((m) => {
     const user = m.users || {};
     const td = trainers.find(t => t.user_id === m.assigned_trainer_id);
+    const plan = plans.find(p => p.id === m.plan_id);
     return {
       id: m.id, name: user.name || 'Unknown', email: user.email || '',
       phone: user.phone || '-', trainer: td?.users?.name || 'Self-Trained',
-      joinDate: m.joined_at || '-', expiryDate: m.membership_end || '-',
+      planName: plan?.name || 'No Plan',
+      joinDate: formatDate(m.joined_at), expiryDate: formatDate(m.membership_end),
       status: computeStatus(m.membership_end), daysLeft: daysRemaining(m.membership_end),
     };
   });
@@ -356,6 +373,7 @@ export default function Members() {
               <tr className="border-b border-white/[0.06]">
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Member</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden md:table-cell">Phone</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden md:table-cell">Plan</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Trainer</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Joined</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Expiry</th>
@@ -387,6 +405,12 @@ export default function Members() {
                     </td>
                     {/* Phone */}
                     <td className="py-sm px-md font-body-md text-[12px] text-on-surface/50 hidden md:table-cell">{member.phone}</td>
+                    {/* Plan */}
+                    <td className="py-sm px-md hidden md:table-cell">
+                      <span className="border border-white/10 px-sm py-[3px] font-label-bold text-[9px] uppercase text-on-surface/60 group-hover:border-primary-container/30 group-hover:text-primary-container transition-colors">
+                        {member.planName}
+                      </span>
+                    </td>
                     {/* Trainer */}
                     <td className="py-sm px-md hidden lg:table-cell">
                       <span className="font-body-md text-[12px] text-on-surface/50">{member.trainer}</span>
@@ -442,7 +466,7 @@ export default function Members() {
               })}
               {paginatedMembers.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="py-xl text-center">
+                  <td colSpan="8" className="py-xl text-center">
                     <div className="flex flex-col items-center gap-sm">
                       <span className="material-symbols-outlined text-on-surface/15 text-[40px]">person_off</span>
                       <p className="font-label-bold text-[11px] text-on-surface/25 uppercase tracking-wider">

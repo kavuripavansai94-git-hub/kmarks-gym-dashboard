@@ -33,6 +33,21 @@ export default function MemberProfile() {
   const [actionError, setActionError] = useState(null);
   const [actionSuccess, setActionSuccess] = useState(null);
 
+  const formatDate = (dateStr) => {
+    if (!dateStr || dateStr === '-') return '-';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('en-IN', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric' 
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
   const handleUpdatePaymentStatus = async (paymentId) => {
     try {
       setActionLoading(true);
@@ -208,8 +223,8 @@ export default function MemberProfile() {
             </div>
             
             <div className="flex gap-md font-label-bold text-[10px] uppercase text-on-surface/40 mt-sm">
-              <span>Joined: <span className="text-white">{member.joined_at ? new Date(member.joined_at).toLocaleDateString() : '-'}</span></span>
-              <span>Expires: <span className={status === 'Expired' ? 'text-error' : 'text-white'}>{member.membership_end ? new Date(member.membership_end).toLocaleDateString() : '-'}</span></span>
+              <span>Joined: <span className="text-white">{formatDate(member.joined_at)}</span></span>
+              <span>Expires: <span className={status === 'Expired' ? 'text-error' : 'text-white'}>{formatDate(member.membership_end)}</span></span>
             </div>
           </div>
         </div>
@@ -338,7 +353,7 @@ export default function MemberProfile() {
                     <tbody>
                       {progress.map((log) => (
                         <tr key={log.id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
-                          <td className="py-sm px-md font-body-md text-[13px] text-white">{new Date(log.date || log.created_at).toLocaleDateString()}</td>
+                          <td className="py-sm px-md font-body-md text-[13px] text-white">{formatDate(log.date || log.created_at)}</td>
                           <td className="py-sm px-md font-label-bold text-[12px] text-primary-container">{log.weight || '-'} kg</td>
                           <td className="py-sm px-md font-body-md text-[13px] text-on-surface/60">{log.body_fat_percentage ? `${log.body_fat_percentage}%` : '-'}</td>
                           <td className="py-sm px-md font-body-md text-[12px] text-on-surface/40 max-w-xs truncate">{log.notes || '-'}</td>
@@ -384,7 +399,7 @@ export default function MemberProfile() {
                         const isPending = statusStr === 'pending' || statusStr === 'overdue';
                         return (
                           <tr key={p.id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
-                            <td className="py-sm px-md font-body-md text-[13px] text-white">{p.payment_date ? new Date(p.payment_date).toLocaleDateString() : '-'}</td>
+                            <td className="py-sm px-md font-body-md text-[13px] text-white">{formatDate(p.payment_date || p.created_at)}</td>
                             <td className="py-sm px-md font-label-bold text-[12px] text-primary-container">₹{p.amount}</td>
                             <td className="py-sm px-md font-body-md text-[13px] text-on-surface/60 capitalize">{p.payment_method || '-'}</td>
                             <td className="py-sm px-md">
