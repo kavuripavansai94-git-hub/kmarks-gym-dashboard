@@ -32,7 +32,7 @@ export default function Trainers() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [specialty, setSpecialty] = useState('Bodybuilding');
+  const [specialty, setSpecialty] = useState('Weight Training');
 
   const fetchTrainers = useCallback(async () => {
     try {
@@ -86,7 +86,7 @@ export default function Trainers() {
         await api.post('/api/trainers', { name, email, phone, specialty });
         setActionSuccess(`${name} added successfully!`);
       }
-      setName(''); setEmail(''); setPhone(''); setSpecialty('Bodybuilding');
+      setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training');
       setEditingTrainerId(null);
       setIsFormOpen(false);
       setTimeout(() => setActionSuccess(null), 3000);
@@ -119,7 +119,7 @@ export default function Trainers() {
   };
 
   const handleCloseForm = () => {
-    setName(''); setEmail(''); setPhone(''); setSpecialty('Bodybuilding');
+    setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training');
     setEditingTrainerId(null);
     setIsFormOpen(false);
     setActionError(null);
@@ -433,12 +433,16 @@ export default function Trainers() {
                       value={specialty} onChange={(e) => setSpecialty(e.target.value)} required
                       className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
                     >
+                      <option value="Weight Training">Weight Training</option>
                       <option value="Bodybuilding">Bodybuilding</option>
-                      <option value="Powerlifting">Powerlifting</option>
-                      <option value="High Intensity">High Intensity</option>
-                      <option value="Yoga / Mobility">Yoga / Mobility</option>
                       <option value="Cardio">Cardio</option>
+                      <option value="Yoga">Yoga</option>
                       <option value="CrossFit">CrossFit</option>
+                      <option value="Calisthenics">Calisthenics</option>
+                      <option value="Nutrition">Nutrition</option>
+                      <option value="Zumba">Zumba</option>
+                      <option value="MMA">MMA</option>
+                      <option value="Other">Other</option>
                     </select>
                     <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
                   </div>

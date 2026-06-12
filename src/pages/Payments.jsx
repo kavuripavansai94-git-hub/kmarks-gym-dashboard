@@ -38,7 +38,16 @@ export default function Payments() {
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
+  const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
+
+  const formatDDMMYYYY = (dateStr) => {
+    if (!dateStr || dateStr === '-') return '-';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '-';
+    const pad = n => n.toString().padStart(2, '0');
+    return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -61,6 +70,7 @@ export default function Payments() {
       const today = new Date().toISOString().split('T')[0];
       const nextMonth = new Date(); nextMonth.setMonth(nextMonth.getMonth() + 1);
       setPeriodStart(today); setPeriodEnd(nextMonth.toISOString().split('T')[0]);
+      setDueDate(today);
     }
   }, [isFormOpen]);
 
@@ -87,11 +97,12 @@ export default function Payments() {
       memberName: user.name || 'Unknown',
       amount: parseFloat(p.amount) || 0,
       rawDate: p.created_at ? new Date(p.created_at) : new Date(0),
-      date: p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : '-',
+      date: p.created_at ? formatDDMMYYYY(p.created_at) : '-',
       status: computePaymentStatus(p),
       paymentMethod: p.payment_method || 'cash',
       periodStart: p.period_start || '-',
       periodEnd: p.period_end || '-',
+      dueDateDisplay: p.period_end ? formatDDMMYYYY(p.period_end) : '-',
     };
   });
 
@@ -136,9 +147,9 @@ export default function Payments() {
       await api.post('/api/payments', {
         member_id: memberId, amount: parseFloat(amount),
         payment_method: paymentMethod, period_start: periodStart,
-        period_end: periodEnd, notes: notes || null,
+        period_end: periodEnd, due_date: dueDate, notes: notes || null,
       });
-      setSelectedMemberId(''); setAmount(''); setPaymentMethod('cash'); setNotes('');
+      setSelectedMemberId(''); setAmount(''); setPaymentMethod('cash'); setNotes(''); setDueDate('');
       setIsFormOpen(false); setCurrentPage(1);
       setActionSuccess('Payment recorded successfully.');
       setTimeout(() => setActionSuccess(null), 3000);
@@ -156,7 +167,7 @@ export default function Payments() {
       p.amount,
       p.paymentMethod,
       p.date,
-      p.periodEnd !== '-' ? new Date(p.periodEnd).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : '-',
+      p.dueDateDisplay,
       p.status
     ]);
     
@@ -438,9 +449,9 @@ export default function Payments() {
         {dateFilter === 'Custom' && (
           <div className="flex gap-sm items-center bg-surface-container border border-white/[0.06] p-sm w-fit">
             <span className="font-label-bold text-[10px] uppercase text-on-surface/40">From:</span>
-            <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="bg-transparent border border-white/10 text-white font-body-md text-[12px] p-1 focus:outline-none focus:border-primary-container/50" />
+            <input type="date" lang="en-IN" value={customStart} onChange={e => setCustomStart(e.target.value)} className="bg-transparent border border-white/10 text-white font-body-md text-[12px] p-1 focus:outline-none focus:border-primary-container/50" />
             <span className="font-label-bold text-[10px] uppercase text-on-surface/40 ml-sm">To:</span>
-            <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="bg-transparent border border-white/10 text-white font-body-md text-[12px] p-1 focus:outline-none focus:border-primary-container/50" />
+            <input type="date" lang="en-IN" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="bg-transparent border border-white/10 text-white font-body-md text-[12px] p-1 focus:outline-none focus:border-primary-container/50" />
           </div>
         )}
       </section>
@@ -489,7 +500,7 @@ export default function Payments() {
                     {payment.date}
                   </td>
                   <td className="py-sm px-md font-body-md text-[12px] text-on-surface/40 hidden lg:table-cell">
-                    {payment.periodEnd !== '-' ? new Date(payment.periodEnd).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : '-'}
+                    {payment.dueDateDisplay}
                   </td>
                   <td className="py-sm px-md text-center">
                     <span className={`inline-flex items-center gap-[4px] px-sm py-[3px] font-label-bold text-[9px] uppercase ${
@@ -652,6 +663,14 @@ export default function Payments() {
                 </div>
 
                 <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Due Date</label>
+                  <input
+                    type="date" lang="en-IN" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
+                    className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-[6px]">
                   <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Notes</label>
                   <input
                     type="text" placeholder="Optional notes" value={notes}
@@ -663,7 +682,7 @@ export default function Payments() {
                 <div className="flex flex-col gap-[6px]">
                   <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Period Start</label>
                   <input
-                    type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)}
+                    type="date" lang="en-IN" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)}
                     className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
                   />
                 </div>
@@ -671,7 +690,7 @@ export default function Payments() {
                 <div className="flex flex-col gap-[6px]">
                   <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Period End</label>
                   <input
-                    type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)}
+                    type="date" lang="en-IN" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)}
                     className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md"
                   />
                 </div>
