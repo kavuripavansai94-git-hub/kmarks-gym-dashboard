@@ -19,7 +19,6 @@ export default function Sidebar() {
     { path: '/plans', name: 'Plans & Packages', icon: 'card_membership' },
     { path: '/enquiries', name: 'Enquiries / Leads', icon: 'contact_phone' },
     { path: '/expenses', name: 'Expenses Tracker', icon: 'receipt_long' },
-    { path: '/announcements', name: 'Announcements', icon: 'campaign' },
     { path: '/analytics', name: 'Analytics', icon: 'bar_chart' },
   ];
 
@@ -36,7 +35,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation List */}
-      <nav className="flex-grow space-y-2 mt-md">
+      <nav className="flex-grow space-y-2 mt-md overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
         {navItems.map((item) => (
           <NavLink
             key={item.path}

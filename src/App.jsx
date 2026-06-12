@@ -8,7 +8,6 @@ import DashboardHome from './pages/DashboardHome';
 import Members from './pages/Members';
 import Trainers from './pages/Trainers';
 import Payments from './pages/Payments';
-import Announcements from './pages/Announcements';
 import MemberProfile from './pages/MemberProfile';
 import TrainerProfile from './pages/TrainerProfile';
 import Analytics from './pages/Analytics';
@@ -67,7 +66,6 @@ export default function App() {
           <Route path="trainers" element={<Trainers />} />
           <Route path="trainers/:id" element={<TrainerProfile />} />
           <Route path="payments" element={<Payments />} />
-          <Route path="announcements" element={<Announcements />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="plans" element={<Plans />} />
           <Route path="settings" element={<Settings />} />
