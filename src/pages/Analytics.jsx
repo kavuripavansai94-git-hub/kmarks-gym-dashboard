@@ -194,9 +194,9 @@ export default function Analytics() {
       {/* ─── ROW 1: KPI CARDS ─── */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-sm lg:gap-gutter">
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] transition-all duration-500 pointer-events-none">
-            <div className="absolute w-[60px] h-[60px] bg-primary-container/10 rounded-full blur-[20px] group-hover:bg-primary-container/20 transition-colors duration-500"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10">payments</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-green-500/10 rounded-full blur-[30px] group-hover:bg-green-500/20 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-green-500/[0.05] group-hover:text-green-500/30 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]">payments</span>
           </div>
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Total Revenue</span>
           <div className="flex items-end justify-between relative z-10">
@@ -205,9 +205,9 @@ export default function Analytics() {
         </div>
         
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] transition-all duration-500 pointer-events-none">
-            <div className="absolute w-[60px] h-[60px] bg-primary-container/10 rounded-full blur-[20px] group-hover:bg-primary-container/20 transition-colors duration-500"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10">group</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-white/5 rounded-full blur-[30px] group-hover:bg-white/10 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-white/[0.02] group-hover:text-white/20 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">group</span>
           </div>
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Total Members</span>
           <div className="flex items-end justify-between relative z-10">
@@ -216,9 +216,9 @@ export default function Analytics() {
         </div>
 
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] transition-all duration-500 pointer-events-none">
-            <div className="absolute w-[60px] h-[60px] bg-primary-container/10 rounded-full blur-[20px] group-hover:bg-primary-container/20 transition-colors duration-500"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10">calendar_month</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-cyan-500/10 rounded-full blur-[30px] group-hover:bg-cyan-500/20 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-cyan-500/[0.05] group-hover:text-cyan-500/30 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(6,182,212,0.6)]">calendar_month</span>
           </div>
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Avg Attendance (Month)</span>
           <div className="flex items-end justify-between relative z-10">
@@ -227,9 +227,9 @@ export default function Analytics() {
         </div>
 
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] transition-all duration-500 pointer-events-none">
-            <div className="absolute w-[60px] h-[60px] bg-primary-container/10 rounded-full blur-[20px] group-hover:bg-primary-container/20 transition-colors duration-500"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10">verified_user</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-green-500/10 rounded-full blur-[30px] group-hover:bg-green-500/20 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-green-500/[0.05] group-hover:text-green-500/30 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]">verified_user</span>
           </div>
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Active Members %</span>
           <div className="flex items-end justify-between relative z-10">

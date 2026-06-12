@@ -294,9 +294,9 @@ export default function Payments() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-sm lg:gap-gutter">
         {/* Total Revenue - Informational */}
         <div className="group relative bg-surface-container border border-white/[0.06] p-sm lg:p-md overflow-hidden hover:border-primary-container/30 transition-all">
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] transition-all duration-500 pointer-events-none">
-            <div className="absolute w-[60px] h-[60px] bg-white/10 rounded-full blur-[20px] group-hover:bg-white/20 transition-colors duration-500"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10">account_balance</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-white/5 rounded-full blur-[30px] group-hover:bg-white/10 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-white/[0.02] group-hover:text-white/20 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">account_balance</span>
           </div>
           <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
           <div className="flex items-center justify-between relative z-10">
@@ -317,9 +317,9 @@ export default function Payments() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-green-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] transition-all duration-500 pointer-events-none">
-            <div className="absolute w-[60px] h-[60px] bg-green-500/10 rounded-full blur-[20px] group-hover:bg-green-500/20 transition-colors duration-500"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10">check_circle</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-green-500/10 rounded-full blur-[30px] group-hover:bg-green-500/20 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-green-500/[0.05] group-hover:text-green-500/30 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]">check_circle</span>
           </div>
           <div className="flex items-center justify-between relative z-10">
             <div>
@@ -339,9 +339,9 @@ export default function Payments() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-yellow-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] transition-all duration-500 pointer-events-none">
-            <div className="absolute w-[60px] h-[60px] bg-yellow-500/10 rounded-full blur-[20px] group-hover:bg-yellow-500/20 transition-colors duration-500"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10">pending_actions</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-yellow-500/10 rounded-full blur-[30px] group-hover:bg-yellow-500/20 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-yellow-500/[0.05] group-hover:text-yellow-500/30 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(234,179,8,0.6)]">pending_actions</span>
           </div>
           <div className="flex items-center justify-between relative z-10">
             <div>
@@ -361,9 +361,9 @@ export default function Payments() {
           }`}
         >
           <div className="absolute top-0 left-0 w-full h-[2px] bg-error scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 group-hover:text-white/[0.05] transition-all duration-500 pointer-events-none">
-            <div className="absolute w-[60px] h-[60px] bg-error/10 rounded-full blur-[20px] group-hover:bg-error/20 transition-colors duration-500"></div>
-            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10">warning</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center font-bold select-none group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+            <div className="absolute w-[100px] h-[100px] bg-error/10 rounded-full blur-[30px] group-hover:bg-error/20 transition-colors duration-700"></div>
+            <span className="material-symbols-outlined text-[64px] leading-none block relative z-10 text-error/[0.05] group-hover:text-error/30 transition-all duration-700 group-hover:drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]">warning</span>
           </div>
           <div className="flex items-center justify-between relative z-10">
             <div>
