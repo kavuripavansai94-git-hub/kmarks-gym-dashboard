@@ -29,53 +29,53 @@ export default function Sidebar() {
       <div style={{ width: '100%', padding: '16px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <img 
           src="/kmarks-logo.png" 
-          style={{ width: '100%', maxWidth: '160px', height: 'auto', marginBottom: '12px' }} 
+          style={{ width: '100%', maxWidth: '160px', height: 'auto', marginBottom: '8px' }} 
           alt="K Mark's Gym Logo" 
         />
         <div style={{ width: '100%', height: '1px', backgroundColor: '#F5C200' }}></div>
       </div>
 
       {/* Navigation List */}
-      <nav className="flex-grow space-y-1.5 mt-3 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+      <nav className="flex-grow space-y-1 mt-2">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3.5 px-md py-[10px] font-label-bold text-[12px] font-bold tracking-[0.03em] uppercase transition-all duration-150 active:scale-95 text-left ${
+              `flex items-center gap-3 px-md py-2 font-label-bold text-[13px] font-bold tracking-[0.05em] uppercase transition-all duration-150 active:scale-95 text-left ${
                 isActive
                   ? 'border-l-4 border-primary-container bg-surface-container-highest text-primary-container'
                   : 'text-on-surface hover:bg-surface-container hover:text-primary-container opacity-70 hover:opacity-100'
               }`
             }
           >
-            <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
+            <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
             <span>{item.name}</span>
           </NavLink>
         ))}
       </nav>
 
       {/* Settings & Logout button at the bottom */}
-      <div className="px-md mt-auto flex flex-col gap-1.5 pb-5">
+      <div className="px-md mt-auto flex flex-col gap-1 pb-4">
         <NavLink
           to="/settings"
           className={({ isActive }) =>
-            `w-full flex items-center gap-3.5 py-[10px] font-label-bold text-[12px] font-bold tracking-[0.03em] uppercase transition-colors duration-200 text-left active:scale-95 ${
+            `w-full flex items-center gap-3 py-2 font-label-bold text-[13px] font-bold tracking-[0.05em] uppercase transition-colors duration-200 text-left active:scale-95 ${
               isActive
                 ? 'text-primary-container'
                 : 'text-on-surface hover:text-primary-container opacity-70 hover:opacity-100'
             }`
           }
         >
-          <span className="material-symbols-outlined text-[22px]">settings</span>
+          <span className="material-symbols-outlined text-[20px]">settings</span>
           <span>Settings</span>
         </NavLink>
         
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3.5 py-[10px] font-label-bold text-[12px] font-bold tracking-[0.03em] uppercase text-on-surface hover:text-error opacity-70 hover:opacity-100 transition-colors duration-200 text-left active:scale-95"
+          className="w-full flex items-center gap-3 py-2 font-label-bold text-[13px] font-bold tracking-[0.05em] uppercase text-on-surface hover:text-error opacity-70 hover:opacity-100 transition-colors duration-200 text-left active:scale-95"
         >
-          <span className="material-symbols-outlined text-[22px]">logout</span>
+          <span className="material-symbols-outlined text-[20px]">logout</span>
           <span>Logout</span>
         </button>
       </div>
