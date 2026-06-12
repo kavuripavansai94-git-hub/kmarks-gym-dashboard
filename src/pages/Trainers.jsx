@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 
 // Animated counter
@@ -52,6 +52,26 @@ export default function Trainers() {
   }, []);
 
   useEffect(() => { fetchTrainers(); }, [fetchTrainers]);
+
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('edit');
+    if (editId && trainers.length > 0 && !isFormOpen) {
+      const t = trainers.find(trainer => trainer.id === editId);
+      if (t) {
+        setName(t.name);
+        setEmail(t.email);
+        setPhone(t.phone);
+        setSpecialty(t.specialty);
+        setJoinedDate(t.joined_at ? new Date(t.joined_at).toISOString().split('T')[0] : '');
+        setCertifications(t.certifications || '');
+        setEditingTrainerId(t.id);
+        setIsFormOpen(true);
+        navigate('/trainers', { replace: true });
+      }
+    }
+  }, [location.search, trainers, isFormOpen, navigate]);
 
   const totalStaff = trainers.length;
   const uniqueSpecialties = new Set(trainers.map(t => t.specialization).filter(Boolean)).size;

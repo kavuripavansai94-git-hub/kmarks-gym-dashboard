@@ -183,7 +183,10 @@ export default function TrainerProfile() {
         </div>
 
         <div className="flex flex-col sm:flex-row md:flex-col gap-sm w-full md:w-auto relative z-10 shrink-0 mt-md md:mt-0">
-          <button className="border border-white/20 text-white font-label-bold text-[11px] px-lg py-md uppercase hover:bg-white/5 transition-colors">
+          <button 
+            onClick={() => navigate(`/trainers?edit=${trainer.id}`)}
+            className="border border-white/20 text-white font-label-bold text-[11px] px-lg py-md uppercase hover:bg-white/5 transition-colors"
+          >
             Edit Trainer
           </button>
           <button 

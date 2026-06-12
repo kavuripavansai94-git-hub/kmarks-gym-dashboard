@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 
 // Animated counter
@@ -68,6 +68,32 @@ export default function Members() {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('edit');
+    if (editId && members.length > 0 && !isFormOpen) {
+      const rawMember = members.find(m => m.id === editId);
+      if (rawMember) {
+        setEditMemberId(rawMember.id);
+        setFullName(rawMember.users?.name || '');
+        setEmail(rawMember.users?.email || '');
+        setPhone(rawMember.users?.phone || '');
+        setTrainerId(rawMember.assigned_trainer_id || '');
+        setPlanId(rawMember.plan_id || '');
+        setGender(rawMember.gender || 'Male');
+        setDob(rawMember.date_of_birth ? new Date(rawMember.date_of_birth).toISOString().split('T')[0] : '');
+        setEmergencyContact(rawMember.emergency_contact || '');
+        setMedicalNotes(rawMember.medical_notes || '');
+        setJoinDate(rawMember.joined_at ? new Date(rawMember.joined_at).toISOString().split('T')[0] : '');
+        setExpiryDate(rawMember.membership_end ? new Date(rawMember.membership_end).toISOString().split('T')[0] : '');
+        setIsFormOpen(true);
+        setActionError(null);
+        navigate('/members', { replace: true });
+      }
+    }
+  }, [location.search, members, isFormOpen, navigate]);
 
   useEffect(() => {
     if (isFormOpen && !editMemberId) {
