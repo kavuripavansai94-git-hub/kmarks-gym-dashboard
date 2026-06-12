@@ -12,6 +12,7 @@ import Attendance from './pages/Attendance';
 import Announcements from './pages/Announcements';
 import MemberProfile from './pages/MemberProfile';
 import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
 
 // Layout wrapper for all authenticated dashboard pages
 function DashboardLayout() {
@@ -65,6 +66,7 @@ export default function App() {
           <Route path="attendance" element={<Attendance />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="analytics" element={<Analytics />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
 
         {/* Fallback Catch-all Route */}

@@ -49,8 +49,22 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Logout button at the bottom */}
-      <div className="px-md mt-auto">
+      {/* Settings & Logout button at the bottom */}
+      <div className="px-md mt-auto flex flex-col gap-sm">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `w-full flex items-center gap-sm py-sm font-label-bold text-label-bold uppercase transition-colors duration-200 text-left active:scale-95 ${
+              isActive
+                ? 'text-primary-container'
+                : 'text-on-surface hover:text-primary-container opacity-70 hover:opacity-100'
+            }`
+          }
+        >
+          <span className="material-symbols-outlined mr-md">settings</span>
+          <span>Settings</span>
+        </NavLink>
+        
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-sm py-sm font-label-bold text-label-bold uppercase text-on-surface hover:text-error opacity-70 hover:opacity-100 transition-colors duration-200 text-left active:scale-95"
