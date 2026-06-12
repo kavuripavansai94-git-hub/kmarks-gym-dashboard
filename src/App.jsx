@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import Plans from './pages/Plans';
 import Enquiries from './pages/Enquiries';
 import Expenses from './pages/Expenses';
+import Branches from './pages/Branches';
 
 // Layout wrapper for all authenticated dashboard pages
 function DashboardLayout() {
@@ -71,6 +72,7 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="enquiries" element={<Enquiries />} />
           <Route path="expenses" element={<Expenses />} />
+          <Route path="branches" element={<Branches />} />
         </Route>
 
         {/* Fallback Catch-all Route */}

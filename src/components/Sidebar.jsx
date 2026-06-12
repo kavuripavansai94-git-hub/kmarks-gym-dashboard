@@ -19,6 +19,7 @@ export default function Sidebar() {
     { path: '/plans', name: 'Plans & Packages', icon: 'card_membership' },
     { path: '/enquiries', name: 'Enquiries / Leads', icon: 'contact_phone' },
     { path: '/expenses', name: 'Expenses Tracker', icon: 'receipt_long' },
+    { path: '/branches', name: 'Branches', icon: 'storefront' },
     { path: '/analytics', name: 'Analytics', icon: 'bar_chart' },
   ];
 
