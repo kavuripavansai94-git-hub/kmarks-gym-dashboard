@@ -361,8 +361,8 @@ export default function Members() {
               className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
             >
               <option value="">All Trainers</option>
-              {[...new Set(displayMembers.map(m => m.trainer))].sort().map(name => (
-                <option key={name} value={name}>{name}</option>
+              {trainers.filter(t => t.users?.name).map(t => (
+                <option key={t.id} value={t.users.name}>{t.users.name}</option>
               ))}
             </select>
           </div>
