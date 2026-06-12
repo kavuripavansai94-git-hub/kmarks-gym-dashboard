@@ -27,6 +27,8 @@ export default function Members() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState('');
+  const [selectedTrainer, setSelectedTrainer] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -124,7 +126,9 @@ export default function Members() {
     const s = searchTerm.toLowerCase();
     const matchSearch = member.name.toLowerCase().includes(s) || member.phone.includes(s) || member.email.toLowerCase().includes(s);
     const matchStatus = !selectedStatus || member.status.toLowerCase() === selectedStatus.toLowerCase();
-    return matchSearch && matchStatus;
+    const matchPlan = !selectedPlan || member.planName === selectedPlan;
+    const matchTrainer = !selectedTrainer || member.trainer === selectedTrainer;
+    return matchSearch && matchStatus && matchPlan && matchTrainer;
   });
 
   const totalPages = Math.ceil(filteredMembers.length / itemsPerPage) || 1;
@@ -325,7 +329,7 @@ export default function Members() {
             <button onClick={() => { setSearchTerm(''); setCurrentPage(1); }} className="material-symbols-outlined text-on-surface/30 hover:text-white text-[18px] transition-colors">close</button>
           )}
         </div>
-        <div className="flex gap-sm">
+        <div className="flex gap-sm flex-wrap">
           <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
             <select
               value={selectedStatus}
@@ -338,9 +342,33 @@ export default function Members() {
               <option value="expiring soon">Expiring Soon</option>
             </select>
           </div>
-          {selectedStatus && (
+          <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
+            <select
+              value={selectedPlan}
+              onChange={(e) => { setSelectedPlan(e.target.value); setCurrentPage(1); }}
+              className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
+            >
+              <option value="">All Plans</option>
+              {[...new Set(displayMembers.map(m => m.planName))].sort().map(name => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
+            <select
+              value={selectedTrainer}
+              onChange={(e) => { setSelectedTrainer(e.target.value); setCurrentPage(1); }}
+              className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
+            >
+              <option value="">All Trainers</option>
+              {[...new Set(displayMembers.map(m => m.trainer))].sort().map(name => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+          {(selectedStatus || selectedPlan || selectedTrainer) && (
             <button
-              onClick={() => { setSelectedStatus(''); setCurrentPage(1); }}
+              onClick={() => { setSelectedStatus(''); setSelectedPlan(''); setSelectedTrainer(''); setCurrentPage(1); }}
               className="border border-white/10 px-sm font-label-bold text-[10px] uppercase text-on-surface/50 hover:text-primary-container hover:border-primary-container/30 transition-colors flex items-center gap-[4px]"
             >
               <span className="material-symbols-outlined text-[14px]">filter_alt_off</span>
@@ -470,9 +498,9 @@ export default function Members() {
                     <div className="flex flex-col items-center gap-sm">
                       <span className="material-symbols-outlined text-on-surface/15 text-[40px]">person_off</span>
                       <p className="font-label-bold text-[11px] text-on-surface/25 uppercase tracking-wider">
-                        {searchTerm || selectedStatus ? 'No matching members found' : 'No members yet'}
+                        {searchTerm || selectedStatus || selectedPlan || selectedTrainer ? 'No matching members found' : 'No members yet'}
                       </p>
-                      {!searchTerm && !selectedStatus && (
+                      {!searchTerm && !selectedStatus && !selectedPlan && !selectedTrainer && (
                         <button
                           onClick={() => setIsFormOpen(true)}
                           className="font-label-bold text-[10px] text-primary-container uppercase border-b border-primary-container/30 hover:border-primary-container transition-colors pb-[2px]"
