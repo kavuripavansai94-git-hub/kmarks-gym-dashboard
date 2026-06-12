@@ -422,9 +422,7 @@ export default function DashboardHome() {
             </div>
 
             {/* Active Today */}
-            <div className="group relative bg-surface-container border border-white/[0.06] p-md hover:border-primary-container/50 transition-all duration-300 cursor-pointer overflow-hidden"
-              onClick={() => navigate('/attendance')}
-            >
+            <div className="group relative bg-surface-container border border-white/[0.06] p-md transition-all duration-300 overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
               <div className="flex items-start justify-between mb-sm">
                 <div>

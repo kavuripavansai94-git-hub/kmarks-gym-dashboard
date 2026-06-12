@@ -8,7 +8,6 @@ import DashboardHome from './pages/DashboardHome';
 import Members from './pages/Members';
 import Trainers from './pages/Trainers';
 import Payments from './pages/Payments';
-import Attendance from './pages/Attendance';
 import Announcements from './pages/Announcements';
 import MemberProfile from './pages/MemberProfile';
 import TrainerProfile from './pages/TrainerProfile';
@@ -65,7 +64,6 @@ export default function App() {
           <Route path="trainers" element={<Trainers />} />
           <Route path="trainers/:id" element={<TrainerProfile />} />
           <Route path="payments" element={<Payments />} />
-          <Route path="attendance" element={<Attendance />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
