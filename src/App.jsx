@@ -10,6 +10,7 @@ import Trainers from './pages/Trainers';
 import Payments from './pages/Payments';
 import Attendance from './pages/Attendance';
 import Announcements from './pages/Announcements';
+import MemberProfile from './pages/MemberProfile';
 
 // Layout wrapper for all authenticated dashboard pages
 function DashboardLayout() {
@@ -57,6 +58,7 @@ export default function App() {
           {/* Sub-views */}
           <Route path="dashboard" element={<DashboardHome />} />
           <Route path="members" element={<Members />} />
+          <Route path="members/:id" element={<MemberProfile />} />
           <Route path="trainers" element={<Trainers />} />
           <Route path="payments" element={<Payments />} />
           <Route path="attendance" element={<Attendance />} />

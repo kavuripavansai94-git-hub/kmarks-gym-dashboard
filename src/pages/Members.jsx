@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 // Animated counter
@@ -14,6 +15,7 @@ function AnimCount({ value, dur = 600 }) {
 }
 
 export default function Members() {
+  const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -359,7 +361,8 @@ export default function Members() {
                 return (
                   <tr
                     key={member.id}
-                    className={`group hover:bg-white/[0.02] transition-colors ${idx < paginatedMembers.length - 1 ? 'border-b border-white/[0.03]' : ''}`}
+                    onClick={() => navigate(`/members/${member.id}`)}
+                    className={`group hover:bg-white/[0.02] cursor-pointer transition-colors ${idx < paginatedMembers.length - 1 ? 'border-b border-white/[0.03]' : ''}`}
                   >
                     {/* Member */}
                     <td className="py-sm px-md">
