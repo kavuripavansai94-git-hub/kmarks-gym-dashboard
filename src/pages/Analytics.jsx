@@ -194,8 +194,8 @@ export default function Analytics() {
       {/* ─── ROW 1: KPI CARDS ─── */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-sm lg:gap-gutter">
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/[0.02] text-[64px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-            <span className="material-symbols-outlined text-[64px]">payments</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[64px] leading-none block">payments</span>
           </div>
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Total Revenue</span>
           <div className="flex items-end justify-between relative z-10">
@@ -204,8 +204,8 @@ export default function Analytics() {
         </div>
         
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/[0.02] text-[64px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-            <span className="material-symbols-outlined text-[64px]">group</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[64px] leading-none block">group</span>
           </div>
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Total Members</span>
           <div className="flex items-end justify-between relative z-10">
@@ -214,8 +214,8 @@ export default function Analytics() {
         </div>
 
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/[0.02] text-[64px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-            <span className="material-symbols-outlined text-[64px]">calendar_month</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[64px] leading-none block">calendar_month</span>
           </div>
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Avg Attendance (Month)</span>
           <div className="flex items-end justify-between relative z-10">
@@ -224,8 +224,8 @@ export default function Analytics() {
         </div>
 
         <div className="bg-surface-container border border-white/[0.06] p-md flex flex-col justify-between hover:border-primary-container/30 transition-colors group relative overflow-hidden">
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/[0.02] text-[64px] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-            <span className="material-symbols-outlined text-[64px]">verified_user</span>
+          <div className="absolute right-4 top-0 bottom-0 flex items-center justify-center text-white/[0.02] font-bold select-none group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <span className="material-symbols-outlined text-[64px] leading-none block">verified_user</span>
           </div>
           <span className="font-label-bold text-on-surface/40 uppercase text-[10px] tracking-wider mb-sm relative z-10">Active Members %</span>
           <div className="flex items-end justify-between relative z-10">
