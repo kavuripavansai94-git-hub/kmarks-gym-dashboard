@@ -24,6 +24,10 @@ export default function Payments() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedMethod, setSelectedMethod] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
@@ -82,7 +86,8 @@ export default function Payments() {
       transactionId: p.transaction_id || p.id.substring(0, 8).toUpperCase(),
       memberName: user.name || 'Unknown',
       amount: parseFloat(p.amount) || 0,
-      date: p.created_at ? new Date(p.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }) : '-',
+      rawDate: p.created_at ? new Date(p.created_at) : new Date(0),
+      date: p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : '-',
       status: computePaymentStatus(p),
       paymentMethod: p.payment_method || 'cash',
       periodStart: p.period_start || '-',
@@ -98,7 +103,24 @@ export default function Payments() {
   const filteredPayments = displayPayments.filter((payment) => {
     const matchesSearch = payment.memberName.toLowerCase().includes(searchTerm.toLowerCase()) || payment.transactionId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !selectedStatus || payment.status === selectedStatus;
-    return matchesSearch && matchesStatus;
+    const matchesMethod = !selectedMethod || payment.paymentMethod.toLowerCase() === selectedMethod.toLowerCase();
+    
+    let matchesDate = true;
+    const pDate = payment.rawDate;
+    const now = new Date();
+    
+    if (dateFilter === 'This Month') {
+      matchesDate = pDate.getMonth() === now.getMonth() && pDate.getFullYear() === now.getFullYear();
+    } else if (dateFilter === 'Last Month') {
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      matchesDate = pDate.getMonth() === lastMonth.getMonth() && pDate.getFullYear() === lastMonth.getFullYear();
+    } else if (dateFilter === 'Custom' && customStart && customEnd) {
+      const start = new Date(customStart); start.setHours(0,0,0,0);
+      const end = new Date(customEnd); end.setHours(23,59,59,999);
+      matchesDate = pDate >= start && pDate <= end;
+    }
+
+    return matchesSearch && matchesStatus && matchesMethod && matchesDate;
   });
 
   const totalPages = Math.ceil(filteredPayments.length / itemsPerPage) || 1;
@@ -124,6 +146,34 @@ export default function Payments() {
     } catch (err) {
       setActionError(err.response?.data?.error || 'Failed to record payment.');
     } finally { setActionLoading(false); }
+  };
+
+  const handleExportCSV = () => {
+    const headers = ['Transaction ID', 'Member', 'Amount', 'Method', 'Date', 'Due Date', 'Status'];
+    const rows = filteredPayments.map(p => [
+      p.transactionId,
+      p.memberName,
+      p.amount,
+      p.paymentMethod,
+      p.date,
+      p.periodEnd !== '-' ? new Date(p.periodEnd).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : '-',
+      p.status
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(r => r.map(f => `"${String(f).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.setAttribute('download', `kmarks-payments-${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleUpdateStatus = async (paymentId, newStatus) => {
@@ -203,6 +253,13 @@ export default function Payments() {
             </h1>
           </div>
           <div className="flex gap-sm">
+            <button
+              onClick={handleExportCSV}
+              className="border border-white/20 text-white/70 font-label-bold text-[12px] px-md py-sm uppercase hover:text-white hover:border-white transition-all flex items-center gap-xs"
+            >
+              <span className="material-symbols-outlined text-[18px]">download</span>
+              Export CSV
+            </button>
             <button
               onClick={() => setIsFormOpen(true)}
               className="bg-primary-container text-on-primary font-label-bold text-[12px] px-md py-sm uppercase hover:brightness-110 active:scale-95 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] flex items-center gap-xs"
@@ -303,44 +360,89 @@ export default function Payments() {
       </div>
 
       {/* ─── Search & Filters ─── */}
-      <section className="flex flex-col sm:flex-row gap-sm">
-        <div className="flex-grow flex items-center bg-surface-container border border-white/[0.06] group px-sm focus-within:border-primary-container/50 transition-colors">
-          <span className="material-symbols-outlined text-on-surface/30 group-focus-within:text-primary-container transition-colors text-[20px]">search</span>
-          <input
-            type="text"
-            placeholder="Search by member name or transaction ID..."
-            value={searchTerm}
-            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-            className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-[13px] py-sm placeholder:text-on-surface/25 pl-sm"
-          />
-          {searchTerm && (
-            <button onClick={() => { setSearchTerm(''); setCurrentPage(1); }} className="material-symbols-outlined text-on-surface/30 hover:text-white text-[18px] transition-colors">close</button>
-          )}
-        </div>
-        <div className="flex gap-sm">
-          <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
-            <select
-              value={selectedStatus}
-              onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
-              className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
-            >
-              <option value="">All Statuses</option>
-              <option value="Paid">Paid</option>
-              <option value="Pending">Pending</option>
-              <option value="Overdue">Overdue</option>
-              <option value="Failed">Failed</option>
-            </select>
+      <section className="flex flex-col gap-sm">
+        <div className="flex flex-col sm:flex-row gap-sm">
+          <div className="flex-grow flex items-center bg-surface-container border border-white/[0.06] group px-sm focus-within:border-primary-container/50 transition-colors">
+            <span className="material-symbols-outlined text-on-surface/30 group-focus-within:text-primary-container transition-colors text-[20px]">search</span>
+            <input
+              type="text"
+              placeholder="Search by member name or transaction ID..."
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-[13px] py-sm placeholder:text-on-surface/25 pl-sm"
+            />
+            {searchTerm && (
+              <button onClick={() => { setSearchTerm(''); setCurrentPage(1); }} className="material-symbols-outlined text-on-surface/30 hover:text-white text-[18px] transition-colors">close</button>
+            )}
           </div>
-          {selectedStatus && (
-            <button
-              onClick={() => { setSelectedStatus(''); setCurrentPage(1); }}
-              className="border border-white/10 px-sm font-label-bold text-[10px] uppercase text-on-surface/50 hover:text-primary-container hover:border-primary-container/30 transition-colors flex items-center gap-[4px]"
-            >
-              <span className="material-symbols-outlined text-[14px]">filter_alt_off</span>
-              Clear
-            </button>
-          )}
+          
+          <div className="flex flex-wrap gap-sm">
+            {/* Status Filter */}
+            <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
+              <select
+                value={selectedStatus}
+                onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
+                className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
+              >
+                <option value="" className="bg-[#1A1A1A] text-white">All Statuses</option>
+                <option value="Paid" className="bg-[#1A1A1A] text-white">Paid</option>
+                <option value="Pending" className="bg-[#1A1A1A] text-white">Pending</option>
+                <option value="Overdue" className="bg-[#1A1A1A] text-white">Overdue</option>
+                <option value="Failed" className="bg-[#1A1A1A] text-white">Failed</option>
+              </select>
+            </div>
+            
+            {/* Method Filter */}
+            <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
+              <select
+                value={selectedMethod}
+                onChange={(e) => { setSelectedMethod(e.target.value); setCurrentPage(1); }}
+                className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
+              >
+                <option value="" className="bg-[#1A1A1A] text-white">All Methods</option>
+                <option value="cash" className="bg-[#1A1A1A] text-white">Cash</option>
+                <option value="upi" className="bg-[#1A1A1A] text-white">UPI</option>
+                <option value="card" className="bg-[#1A1A1A] text-white">Card</option>
+                <option value="bank_transfer" className="bg-[#1A1A1A] text-white">Bank Transfer</option>
+                <option value="other" className="bg-[#1A1A1A] text-white">Other</option>
+              </select>
+            </div>
+
+            {/* Date Filter */}
+            <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
+              <select
+                value={dateFilter}
+                onChange={(e) => { setDateFilter(e.target.value); setCurrentPage(1); }}
+                className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
+              >
+                <option value="" className="bg-[#1A1A1A] text-white">All Time</option>
+                <option value="This Month" className="bg-[#1A1A1A] text-white">This Month</option>
+                <option value="Last Month" className="bg-[#1A1A1A] text-white">Last Month</option>
+                <option value="Custom" className="bg-[#1A1A1A] text-white">Custom Range</option>
+              </select>
+            </div>
+            
+            {(selectedStatus || selectedMethod || dateFilter) && (
+              <button
+                onClick={() => { setSelectedStatus(''); setSelectedMethod(''); setDateFilter(''); setCustomStart(''); setCustomEnd(''); setCurrentPage(1); }}
+                className="border border-white/10 px-sm font-label-bold text-[10px] uppercase text-on-surface/50 hover:text-primary-container hover:border-primary-container/30 transition-colors flex items-center gap-[4px]"
+              >
+                <span className="material-symbols-outlined text-[14px]">filter_alt_off</span>
+                Clear
+              </button>
+            )}
+          </div>
         </div>
+        
+        {/* Custom Date Range Inputs */}
+        {dateFilter === 'Custom' && (
+          <div className="flex gap-sm items-center bg-surface-container border border-white/[0.06] p-sm w-fit">
+            <span className="font-label-bold text-[10px] uppercase text-on-surface/40">From:</span>
+            <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="bg-transparent border border-white/10 text-white font-body-md text-[12px] p-1 focus:outline-none focus:border-primary-container/50" />
+            <span className="font-label-bold text-[10px] uppercase text-on-surface/40 ml-sm">To:</span>
+            <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="bg-transparent border border-white/10 text-white font-body-md text-[12px] p-1 focus:outline-none focus:border-primary-container/50" />
+          </div>
+        )}
       </section>
 
       {/* ─── Payments Table ─── */}
@@ -353,6 +455,7 @@ export default function Payments() {
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Amount</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden md:table-cell">Method</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Date</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Due Date</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider text-center">Status</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider text-right">Actions</th>
               </tr>
@@ -384,6 +487,9 @@ export default function Payments() {
                   </td>
                   <td className="py-sm px-md font-body-md text-[12px] text-on-surface/40 hidden lg:table-cell">
                     {payment.date}
+                  </td>
+                  <td className="py-sm px-md font-body-md text-[12px] text-on-surface/40 hidden lg:table-cell">
+                    {payment.periodEnd !== '-' ? new Date(payment.periodEnd).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : '-'}
                   </td>
                   <td className="py-sm px-md text-center">
                     <span className={`inline-flex items-center gap-[4px] px-sm py-[3px] font-label-bold text-[9px] uppercase ${
