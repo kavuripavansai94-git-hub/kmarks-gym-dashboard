@@ -26,10 +26,10 @@ export default function Sidebar() {
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col pb-lg z-50">
       {/* Branding */}
-      <div style={{ width: '100%', padding: '16px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: '100%', padding: '20px 16px 12px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <img 
           src="/kmarks-logo.png" 
-          style={{ width: '100%', maxWidth: '160px', height: 'auto', marginBottom: '8px' }} 
+          style={{ width: '100%', maxWidth: '200px', height: 'auto', marginBottom: '12px' }} 
           alt="K Mark's Gym Logo" 
         />
         <div style={{ width: '100%', height: '1px', backgroundColor: '#F5C200' }}></div>
