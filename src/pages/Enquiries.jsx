@@ -78,7 +78,10 @@ function Enquiries() {
   };
 
   // Status updates directly from dropdown in table
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, newStatus, currentLead) => {
+    if (newStatus === 'Converted') {
+      return handleConvertToMember(id, currentLead);
+    }
     try {
       const response = await api.put(`/api/leads/${id}`, { status: newStatus });
       const updatedLead = response.data.lead;
@@ -303,10 +306,9 @@ function Enquiries() {
                   <td className="p-sm text-sm text-on-surface/70">{enq.phone}</td>
                   <td className="p-sm text-sm text-on-surface/70">{enq.source}</td>
                   <td className="p-sm">
-                    {/* Inline Status Updater */}
                     <select 
                       value={enq.status}
-                      onChange={(e) => handleStatusChange(enq.id, e.target.value)}
+                      onChange={(e) => handleStatusChange(enq.id, e.target.value, enq)}
                       className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border outline-none cursor-pointer appearance-none ${getStatusColor(enq.status)}`}
                     >
                       <option value="New">New</option>
