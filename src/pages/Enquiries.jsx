@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 
 function Enquiries() {
   const [enquiries, setEnquiries] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [showBanner, setShowBanner] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -14,24 +15,77 @@ function Enquiries() {
   const [status, setStatus] = useState('New');
   const [notes, setNotes] = useState('');
 
+  // Formatted date string for today's follow-ups
+  const todayIso = new Date().toISOString().split('T')[0];
+
   useEffect(() => {
-    const saved = localStorage.getItem('kmarks_leads');
-    if (saved) setEnquiries(JSON.parse(saved));
+    fetchLeads();
   }, []);
 
-  const handleAddLead = (e) => {
+  const fetchLeads = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/api/leads');
+      // Backend returns { leads: [...] }
+      setEnquiries(response.data.leads || []);
+    } catch (error) {
+      console.error('Failed to fetch leads', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddLead = async (e) => {
     e.preventDefault();
-    const newLead = {
-      id: Date.now(),
-      name, phone, source, status, notes,
-      date: new Date().toISOString().split('T')[0],
-      followUp: '-'
-    };
-    const updated = [newLead, ...enquiries];
-    setEnquiries(updated);
-    localStorage.setItem('kmarks_leads', JSON.stringify(updated));
-    setIsModalOpen(false);
-    setName(''); setPhone(''); setSource('Walk-in'); setStatus('New'); setNotes('');
+    try {
+      const newLead = {
+        name,
+        phone,
+        source,
+        status,
+        notes,
+        // Optional: auto-set follow-up based on status
+      };
+
+      const response = await api.post('/api/leads', newLead);
+      const createdLead = response.data.lead;
+
+      setEnquiries([createdLead, ...enquiries]);
+      setIsModalOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error('Failed to create lead', error);
+      alert('Failed to save lead. Please check the connection.');
+    }
+  };
+
+  const resetForm = () => {
+    setName('');
+    setPhone('');
+    setSource('Walk-in');
+    setStatus('New');
+    setNotes('');
+  };
+
+  const handleDeleteLead = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this lead?")) return;
+    try {
+      await api.delete(`/api/leads/${id}`);
+      setEnquiries(enquiries.filter(e => e.id !== id));
+    } catch (error) {
+      console.error('Failed to delete lead', error);
+    }
+  };
+
+  // Status updates directly from dropdown in table
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const response = await api.put(`/api/leads/${id}`, { status: newStatus });
+      const updatedLead = response.data.lead;
+      setEnquiries(enquiries.map(e => e.id === id ? updatedLead : e));
+    } catch (error) {
+      console.error('Failed to update status', error);
+    }
   };
 
   const filteredEnquiries = enquiries.filter(enq => {
@@ -52,22 +106,18 @@ function Enquiries() {
     }
   };
 
+  const totalLeads = enquiries.length;
+  const convertedCount = enquiries.filter(e => e.status === 'Converted').length;
+  const followUpsToday = enquiries.filter(e => e.follow_up_date === todayIso).length;
+  const lostCount = enquiries.filter(e => e.status === 'Lost').length;
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="p-gutter pb-32"
     >
-      {showBanner && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 px-md py-sm font-label-bold text-[11px] uppercase flex justify-between items-center mb-md animate-[slideDown_0.3s_ease]">
-          <div className="flex items-center gap-sm">
-            <span className="material-symbols-outlined text-[16px]">info</span>
-            <span>Lead tracking database coming soon. You can manually add leads below.</span>
-          </div>
-          <button onClick={() => setShowBanner(false)} className="material-symbols-outlined text-[16px] hover:text-white transition-colors">close</button>
-        </div>
-      )}
-
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-sm border border-white/5 bg-gradient-to-br from-surface-container via-surface-container-high to-surface-container p-md relative overflow-hidden mb-lg">
         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
         <div>
@@ -93,7 +143,7 @@ function Enquiries() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Total Leads</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">{enquiries.length}</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">{totalLeads}</h2>
             </div>
           </div>
         </div>
@@ -108,7 +158,7 @@ function Enquiries() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Converted</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">{enquiries.filter(e => e.status === 'Converted').length}</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">{convertedCount}</h2>
             </div>
           </div>
         </div>
@@ -123,7 +173,7 @@ function Enquiries() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Follow-ups Today</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">{enquiries.filter(e => e.followUp === new Date().toISOString().split('T')[0]).length}</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">{followUpsToday}</h2>
             </div>
           </div>
         </div>
@@ -138,7 +188,7 @@ function Enquiries() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Lost Leads</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">{enquiries.filter(e => e.status === 'Lost').length}</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">{lostCount}</h2>
             </div>
           </div>
         </div>
@@ -194,7 +244,14 @@ function Enquiries() {
               </tr>
             </thead>
             <tbody>
-              {filteredEnquiries.map((enq, index) => (
+              {loading ? (
+                 <tr>
+                 <td colSpan="7" className="p-xl text-center text-on-surface/40">
+                   <div className="animate-spin w-8 h-8 border-2 border-primary-container border-t-transparent rounded-full mx-auto mb-4"></div>
+                   <p>Loading leads...</p>
+                 </td>
+               </tr>
+              ) : filteredEnquiries.map((enq) => (
                 <tr 
                   key={enq.id} 
                   className="border-b border-white/[0.06] hover:bg-white/[0.02] transition-colors group"
@@ -202,7 +259,7 @@ function Enquiries() {
                   <td className="p-sm">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container font-bold text-sm">
-                        {enq.name.charAt(0)}
+                        {enq.name.charAt(0).toUpperCase()}
                       </div>
                       <span className="font-bold text-on-surface text-sm">{enq.name}</span>
                     </div>
@@ -210,34 +267,46 @@ function Enquiries() {
                   <td className="p-sm text-sm text-on-surface/70">{enq.phone}</td>
                   <td className="p-sm text-sm text-on-surface/70">{enq.source}</td>
                   <td className="p-sm">
-                    <span className={`inline-block px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(enq.status)}`}>
-                      {enq.status}
-                    </span>
+                    {/* Inline Status Updater */}
+                    <select 
+                      value={enq.status}
+                      onChange={(e) => handleStatusChange(enq.id, e.target.value)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border outline-none cursor-pointer appearance-none ${getStatusColor(enq.status)}`}
+                    >
+                      <option value="New">New</option>
+                      <option value="Contacted">Contacted</option>
+                      <option value="Trial">Trial</option>
+                      <option value="Converted">Converted</option>
+                      <option value="Lost">Lost</option>
+                    </select>
                   </td>
-                  <td className="p-sm text-sm text-on-surface/70">{enq.date}</td>
+                  <td className="p-sm text-sm text-on-surface/70">
+                    {new Date(enq.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </td>
                   <td className="p-sm text-sm">
-                    <span className={enq.followUp === '2023-10-26' || enq.followUp === '2023-10-27' ? 'text-yellow-500 font-bold' : 'text-on-surface/70'}>
-                      {enq.followUp}
+                    <span className={enq.follow_up_date === todayIso ? 'text-yellow-500 font-bold' : 'text-on-surface/70'}>
+                      {enq.follow_up_date ? new Date(enq.follow_up_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '-'}
                     </span>
                   </td>
                   <td className="p-sm text-right">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-white/10 hover:text-primary-container transition-colors">
-                        <span className="material-symbols-outlined text-[16px]">edit</span>
-                      </button>
-                      <button className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-white/10 hover:text-green-500 transition-colors">
-                        <span className="material-symbols-outlined text-[16px]">call</span>
+                      <button 
+                        onClick={() => handleDeleteLead(enq.id)}
+                        className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-error/20 hover:text-error transition-colors"
+                        title="Delete Lead"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
                       </button>
                     </div>
                   </td>
                 </tr>
               ))}
               
-              {filteredEnquiries.length === 0 && (
+              {!loading && filteredEnquiries.length === 0 && (
                 <tr>
                   <td colSpan="7" className="p-xl text-center text-on-surface/40">
                     <span className="material-symbols-outlined text-[48px] mb-2 block opacity-50">group_add</span>
-                    <p>No leads yet. Add your first lead.</p>
+                    <p>No leads found.</p>
                   </td>
                 </tr>
               )}
