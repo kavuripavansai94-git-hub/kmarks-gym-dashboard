@@ -38,12 +38,12 @@ function Expenses() {
       className="p-gutter pb-32"
     >
       {showBanner && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 px-md py-sm font-label-bold text-[11px] uppercase flex justify-between items-center mb-md animate-[slideDown_0.3s_ease]">
+        <div className="bg-[#F5C200] text-black px-md py-sm font-label-bold text-[12px] uppercase flex justify-between items-center mb-lg -mt-gutter -mx-gutter animate-[slideDown_0.3s_ease]">
           <div className="flex items-center gap-sm">
-            <span className="material-symbols-outlined text-[16px]">info</span>
-            <span>This feature is being connected to the database. Data shown is for preview only.</span>
+            <span className="text-[16px] font-bold">⚠</span>
+            <span>This section is under development. Data shown is for preview only.</span>
           </div>
-          <button onClick={() => setShowBanner(false)} className="material-symbols-outlined text-[16px] hover:text-white transition-colors">close</button>
+          <button onClick={() => setShowBanner(false)} className="material-symbols-outlined text-[16px] hover:opacity-70 transition-opacity">close</button>
         </div>
       )}
 
