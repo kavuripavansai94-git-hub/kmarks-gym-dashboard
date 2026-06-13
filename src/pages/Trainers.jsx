@@ -42,14 +42,19 @@ export default function Trainers() {
   const fetchTrainers = useCallback(async () => {
     try {
       setLoading(true); setError(null);
-      const [trainersRes, membersRes, branchesRes] = await Promise.all([
+      const [trainersRes, membersRes] = await Promise.all([
         api.get('/api/trainers'),
-        api.get('/api/members'),
-        api.get('/api/branches')
+        api.get('/api/members')
       ]);
       setTrainers(trainersRes.data.trainers || []);
       setMembers(membersRes.data.members || []);
-      setBranches(branchesRes.data.branches || []);
+      
+      try {
+        const branchesRes = await api.get('/api/branches');
+        setBranches(branchesRes.data.branches || []);
+      } catch (err) {
+        console.warn('Could not fetch branches:', err);
+      }
     } catch (err) {
       console.error('Failed to fetch trainers:', err);
       setError('Failed to load trainers. Please try again.');
