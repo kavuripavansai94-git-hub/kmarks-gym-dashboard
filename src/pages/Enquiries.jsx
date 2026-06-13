@@ -97,8 +97,10 @@ function Enquiries() {
       const response = await api.put(`/api/leads/${id}`, { last_contacted_at: updatedTime });
       const updatedLead = response.data.lead;
       setEnquiries(enquiries.map(e => e.id === id ? updatedLead : e));
+      alert(`Contact logged for ${currentLead.name}!`);
     } catch (error) {
       console.error('Failed to log contact', error);
+      alert('Failed to log contact. Did you run the SQL Migration in Supabase to add the last_contacted_at column?');
     }
   };
 
@@ -311,12 +313,12 @@ function Enquiries() {
                       onChange={(e) => handleStatusChange(enq.id, e.target.value, enq)}
                       className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border outline-none cursor-pointer appearance-none ${getStatusColor(enq.status)}`}
                     >
-                      <option value="New">New</option>
-                      <option value="Hot">Hot</option>
-                      <option value="Warm">Warm</option>
-                      <option value="Cold">Cold</option>
-                      <option value="Converted">Converted</option>
-                      <option value="Lost">Lost</option>
+                      <option value="New" className="bg-[#121212] text-white">New</option>
+                      <option value="Hot" className="bg-[#121212] text-white">Hot</option>
+                      <option value="Warm" className="bg-[#121212] text-white">Warm</option>
+                      <option value="Cold" className="bg-[#121212] text-white">Cold</option>
+                      <option value="Converted" className="bg-[#121212] text-white">Converted</option>
+                      <option value="Lost" className="bg-[#121212] text-white">Lost</option>
                     </select>
                   </td>
                   <td className="p-sm text-sm text-on-surface/70">
