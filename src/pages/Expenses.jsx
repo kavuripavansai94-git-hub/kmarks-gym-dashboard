@@ -58,6 +58,43 @@ function Expenses() {
         </button>
       </div>
 
+      {/* QUICK GUIDE */}
+      <div className="bg-primary-container/10 border border-primary-container/20 p-md lg:p-lg mb-lg relative overflow-hidden">
+        {/* Decorative background glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-container/5 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        
+        <div className="flex items-start gap-md relative z-10">
+          <div className="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center shrink-0 border border-primary-container/30">
+            <span className="material-symbols-outlined text-primary-container text-[20px]">lightbulb</span>
+          </div>
+          <div>
+            <h3 className="font-heading font-bold text-primary-container text-[16px] mb-xs uppercase tracking-wider">How to use this tracker</h3>
+            <p className="font-body text-[14px] text-on-surface/80 leading-relaxed mb-md max-w-4xl">
+              While the <strong>Payments</strong> page tracks your gym's income, this page tracks your outflows. 
+              Logging every operational cost (Rent, Salaries, Electricity, Maintenance) helps you calculate your true <strong>Net Profit</strong> and makes tax filing much easier.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-sm font-body text-[13px]">
+              <div className="flex items-start gap-xs bg-surface-container/50 p-sm border border-white/5">
+                <span className="material-symbols-outlined text-[16px] text-green-500 mt-[2px]">check_circle</span>
+                <div><strong className="text-white block mb-[2px]">Paid</strong><span className="text-on-surface/60 text-[11px] leading-tight block">Bills you have successfully cleared.</span></div>
+              </div>
+              <div className="flex items-start gap-xs bg-surface-container/50 p-sm border border-white/5">
+                <span className="material-symbols-outlined text-[16px] text-yellow-500 mt-[2px]">pending_actions</span>
+                <div><strong className="text-white block mb-[2px]">Pending</strong><span className="text-on-surface/60 text-[11px] leading-tight block">Upcoming bills you need to pay soon.</span></div>
+              </div>
+              <div className="flex items-start gap-xs bg-surface-container/50 p-sm border border-white/5">
+                <span className="material-symbols-outlined text-[16px] text-error mt-[2px]">warning</span>
+                <div><strong className="text-white block mb-[2px]">Overdue</strong><span className="text-on-surface/60 text-[11px] leading-tight block">Bills past their due date.</span></div>
+              </div>
+              <div className="flex items-start gap-xs bg-surface-container/50 p-sm border border-white/5">
+                <span className="material-symbols-outlined text-[16px] text-primary-container mt-[2px]">add_circle</span>
+                <div><strong className="text-white block mb-[2px]">Add Expense</strong><span className="text-on-surface/60 text-[11px] leading-tight block">Click here to log a new expense.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* KPI CARDS */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-sm lg:gap-gutter mb-lg">
         {/* Total Expenses */}
