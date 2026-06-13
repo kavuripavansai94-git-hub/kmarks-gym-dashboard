@@ -18,6 +18,7 @@ export default function Trainers() {
   const navigate = useNavigate();
   const [trainers, setTrainers] = useState([]);
   const [members, setMembers] = useState([]);
+  const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -25,6 +26,7 @@ export default function Trainers() {
   const [actionSuccess, setActionSuccess] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTrainerId, setEditingTrainerId] = useState(null);
 
@@ -33,18 +35,21 @@ export default function Trainers() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [specialty, setSpecialty] = useState('Weight Training');
+  const [branchId, setBranchId] = useState('');
   const [joinedDate, setJoinedDate] = useState('');
   const [certifications, setCertifications] = useState('');
 
   const fetchTrainers = useCallback(async () => {
     try {
       setLoading(true); setError(null);
-      const [trainersRes, membersRes] = await Promise.all([
+      const [trainersRes, membersRes, branchesRes] = await Promise.all([
         api.get('/api/trainers'),
-        api.get('/api/members')
+        api.get('/api/members'),
+        api.get('/api/branches')
       ]);
       setTrainers(trainersRes.data.trainers || []);
       setMembers(membersRes.data.members || []);
+      setBranches(branchesRes.data.branches || []);
     } catch (err) {
       console.error('Failed to fetch trainers:', err);
       setError('Failed to load trainers. Please try again.');
@@ -64,6 +69,7 @@ export default function Trainers() {
         setEmail(t.email);
         setPhone(t.phone);
         setSpecialty(t.specialty);
+        setBranchId(t.branch_id || '');
         setJoinedDate(t.joined_at ? new Date(t.joined_at).toISOString().split('T')[0] : '');
         setCertifications(t.certifications || '');
         setEditingTrainerId(t.id);
@@ -80,6 +86,7 @@ export default function Trainers() {
   const displayTrainers = trainers.map((t) => {
     const user = t.users || {};
     const assignedCount = members.filter(m => m.assigned_trainer_id === t.user_id).length;
+    const branch = branches.find(b => String(b.id) === String(t.branch_id));
     return {
       id: t.id,
       user_id: t.user_id,
@@ -87,14 +94,16 @@ export default function Trainers() {
       email: user.email || '',
       phone: user.phone || '-',
       specialty: t.specialization || '-',
+      branchName: branch?.name || 'Unassigned',
       joinedDate: t.created_at ? new Date(t.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : '-',
       assignedCount
     };
   });
 
   const filteredTrainers = displayTrainers.filter(t =>
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.specialty.toLowerCase().includes(searchTerm.toLowerCase())
+    (t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.specialty.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (!selectedBranch || t.branchName === selectedBranch)
   );
 
   const handleSubmit = async (e) => {
@@ -102,7 +111,7 @@ export default function Trainers() {
     try {
       setActionLoading(true); setActionError(null);
       const payload = {
-        name, email, phone, specialty,
+        name, email, phone, specialty, branch_id: branchId || null,
         joined_at: joinedDate, certifications: certifications || null
       };
       if (editingTrainerId) {
@@ -112,7 +121,7 @@ export default function Trainers() {
         await api.post('/api/trainers', payload);
         setActionSuccess(`${name} added successfully!`);
       }
-      setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training'); setJoinedDate(''); setCertifications('');
+      setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training'); setBranchId(''); setJoinedDate(''); setCertifications('');
       setEditingTrainerId(null);
       setIsFormOpen(false);
       setTimeout(() => setActionSuccess(null), 3000);
@@ -127,6 +136,8 @@ export default function Trainers() {
     setEmail(trainer.email);
     setPhone(trainer.phone);
     setSpecialty(trainer.specialty);
+    const rawT = trainers.find(t => t.id === trainer.id);
+    setBranchId(rawT?.branch_id || '');
     setJoinedDate(trainer.joined_at ? new Date(trainer.joined_at).toISOString().split('T')[0] : '');
     setCertifications(trainer.certifications || '');
     setEditingTrainerId(trainer.id);
@@ -147,7 +158,7 @@ export default function Trainers() {
   };
 
   const openAddForm = () => {
-    setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training');
+    setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training'); setBranchId('');
     const today = new Date().toISOString().split('T')[0];
     setJoinedDate(today); setCertifications('');
     setEditingTrainerId(null);
@@ -156,7 +167,7 @@ export default function Trainers() {
   };
 
   const handleCloseForm = () => {
-    setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training');
+    setName(''); setEmail(''); setPhone(''); setSpecialty('Weight Training'); setBranchId('');
     setJoinedDate(''); setCertifications('');
     setEditingTrainerId(null);
     setIsFormOpen(false);
@@ -311,6 +322,29 @@ export default function Trainers() {
             <button onClick={() => setSearchTerm('')} className="material-symbols-outlined text-on-surface/30 hover:text-white text-[18px] transition-colors">close</button>
           )}
         </div>
+        <div className="flex gap-sm flex-wrap">
+          <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
+            <select
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
+              className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
+            >
+              <option value="" className="bg-[#1A1A1A] text-white">All Branches</option>
+              {branches.map(b => (
+                <option key={b.id} value={b.name} className="bg-[#1A1A1A] text-white">{b.name}</option>
+              ))}
+            </select>
+          </div>
+          {selectedBranch && (
+            <button
+              onClick={() => setSelectedBranch('')}
+              className="border border-white/10 px-sm font-label-bold text-[10px] uppercase text-on-surface/50 hover:text-primary-container hover:border-primary-container/30 transition-colors flex items-center gap-[4px]"
+            >
+              <span className="material-symbols-outlined text-[14px]">filter_alt_off</span>
+              Clear
+            </button>
+          )}
+        </div>
       </section>
 
       {/* ─── Trainers Table ─── */}
@@ -321,6 +355,7 @@ export default function Trainers() {
               <tr className="border-b border-white/[0.06]">
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Trainer</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden md:table-cell">Phone</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Branch</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Specialty</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider text-center hidden md:table-cell">Members Assigned</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Joined</th>
@@ -346,6 +381,9 @@ export default function Trainers() {
                     </div>
                   </td>
                   <td className="py-sm px-md font-body-md text-[12px] text-on-surface/50 hidden md:table-cell">{trainer.phone}</td>
+                  <td className="py-sm px-md hidden lg:table-cell">
+                    <span className="font-body-md text-[12px] text-on-surface/50">{trainer.branchName}</span>
+                  </td>
                   <td className="py-sm px-md">
                     <span className="border border-white/10 px-sm py-[3px] font-label-bold text-[9px] uppercase text-on-surface/60 group-hover:border-primary-container/30 group-hover:text-primary-container transition-colors whitespace-nowrap">
                       {trainer.specialty}
@@ -396,7 +434,7 @@ export default function Trainers() {
               ))}
               {filteredTrainers.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="py-xl text-center">
+                  <td colSpan="7" className="py-xl text-center">
                     <div className="flex flex-col items-center gap-sm">
                       <span className="material-symbols-outlined text-on-surface/15 text-[40px]">search_off</span>
                       <p className="font-label-bold text-[11px] text-on-surface/25 uppercase tracking-wider">
@@ -484,6 +522,21 @@ export default function Trainers() {
                       <option value="Zumba">Zumba</option>
                       <option value="MMA">MMA</option>
                       <option value="Other">Other</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Branch</label>
+                  <div className="relative">
+                    <select
+                      value={branchId} onChange={(e) => setBranchId(e.target.value)}
+                      className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
+                    >
+                      <option value="">No Branch Selected</option>
+                      {branches.map(b => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
                     </select>
                     <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
                   </div>

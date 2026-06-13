@@ -19,6 +19,7 @@ export default function Members() {
   const [members, setMembers] = useState([]);
   const [trainers, setTrainers] = useState([]);
   const [plans, setPlans] = useState([]);
+  const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -29,6 +30,7 @@ export default function Members() {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('');
   const [selectedTrainer, setSelectedTrainer] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -40,6 +42,7 @@ export default function Members() {
   const [phone, setPhone] = useState('');
   const [trainerId, setTrainerId] = useState('');
   const [planId, setPlanId] = useState('');
+  const [branchId, setBranchId] = useState('');
   const [joinDate, setJoinDate] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [gender, setGender] = useState('Male');
@@ -60,6 +63,12 @@ export default function Members() {
         setPlans(plansRes.data.plans || []);
       } catch (err) {
         console.warn('Could not fetch plans:', err);
+      }
+      try {
+        const branchesRes = await api.get('/api/branches');
+        setBranches(branchesRes.data.branches || []);
+      } catch (err) {
+        console.warn('Could not fetch branches:', err);
       }
     } catch (err) {
       console.error('Fetch error:', err);
@@ -82,6 +91,7 @@ export default function Members() {
         setPhone(rawMember.users?.phone || '');
         setTrainerId(rawMember.assigned_trainer_id || '');
         setPlanId(rawMember.plan_id || '');
+        setBranchId(rawMember.branch_id || '');
         setGender(rawMember.gender || 'Male');
         setDob(rawMember.date_of_birth ? new Date(rawMember.date_of_birth).toISOString().split('T')[0] : '');
         setEmergencyContact(rawMember.emergency_contact || '');
@@ -105,7 +115,7 @@ export default function Members() {
 
   const openAddForm = () => {
     setEditMemberId(null);
-    setFullName(''); setEmail(''); setPhone(''); setTrainerId(''); setPlanId('');
+    setFullName(''); setEmail(''); setPhone(''); setTrainerId(''); setPlanId(''); setBranchId('');
     setGender('Male'); setDob(''); setEmergencyContact(''); setMedicalNotes('');
     const today = new Date().toISOString().split('T')[0];
     const ny = new Date(); ny.setFullYear(ny.getFullYear() + 1);
@@ -123,6 +133,7 @@ export default function Members() {
     setPhone(rawMember.users?.phone || '');
     setTrainerId(rawMember.assigned_trainer_id || '');
     setPlanId(rawMember.plan_id || '');
+    setBranchId(rawMember.branch_id || '');
     setGender(rawMember.gender || 'Male');
     setDob(rawMember.date_of_birth ? new Date(rawMember.date_of_birth).toISOString().split('T')[0] : '');
     setEmergencyContact(rawMember.emergency_contact || '');
@@ -169,10 +180,12 @@ export default function Members() {
     const user = m.users || {};
     const td = trainers.find(t => String(t.id) === String(m.assigned_trainer_id));
     const plan = plans.find(p => String(p.id) === String(m.plan_id));
+    const branch = branches.find(b => String(b.id) === String(m.branch_id));
     return {
       id: m.id, name: user.name || 'Unknown', email: user.email || '',
       phone: user.phone || '-', trainer: td?.users?.name || td?.name || 'Self-Trained',
       planName: plan?.name || 'No Plan',
+      branchName: branch?.name || 'Unassigned',
       joinDate: formatDate(m.joined_at), expiryDate: formatDate(m.membership_end),
       status: computeStatus(m.membership_end), daysLeft: daysRemaining(m.membership_end),
     };
@@ -189,7 +202,8 @@ export default function Members() {
     const matchStatus = !selectedStatus || member.status.toLowerCase() === selectedStatus.toLowerCase();
     const matchPlan = !selectedPlan || member.planName === selectedPlan;
     const matchTrainer = !selectedTrainer || member.trainer === selectedTrainer;
-    return matchSearch && matchStatus && matchPlan && matchTrainer;
+    const matchBranch = !selectedBranch || member.branchName === selectedBranch;
+    return matchSearch && matchStatus && matchPlan && matchTrainer && matchBranch;
   });
 
   const totalPages = Math.ceil(filteredMembers.length / itemsPerPage) || 1;
@@ -207,6 +221,7 @@ export default function Members() {
         medical_notes: medicalNotes || null,
         trainer_id: trainerId || null,
         plan_id: planId || null,
+        branch_id: branchId || null,
         join_date: joinDate, expiry_date: expiryDate,
       };
 
@@ -240,11 +255,12 @@ export default function Members() {
   };
 
   const handleExportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Plan', 'Trainer', 'Joined Date', 'Expiry Date', 'Status'];
+    const headers = ['Name', 'Email', 'Phone', 'Branch', 'Plan', 'Trainer', 'Joined Date', 'Expiry Date', 'Status'];
     const rows = filteredMembers.map(m => [
       m.name,
       m.email,
       m.phone,
+      m.branchName,
       m.planName,
       m.trainer,
       m.joinDate,
@@ -477,9 +493,21 @@ export default function Members() {
               ))}
             </select>
           </div>
-          {(selectedStatus || selectedPlan || selectedTrainer) && (
+          <div className="bg-surface-container border border-white/[0.06] focus-within:border-primary-container/50 transition-colors">
+            <select
+              value={selectedBranch}
+              onChange={(e) => { setSelectedBranch(e.target.value); setCurrentPage(1); }}
+              className="bg-transparent border-none focus:ring-0 text-on-surface font-label-bold text-[11px] py-sm px-sm uppercase appearance-none pr-lg cursor-pointer"
+            >
+              <option value="" className="bg-[#1A1A1A] text-white">All Branches</option>
+              {branches.map(b => (
+                <option key={b.id} value={b.name} className="bg-[#1A1A1A] text-white">{b.name}</option>
+              ))}
+            </select>
+          </div>
+          {(selectedStatus || selectedPlan || selectedTrainer || selectedBranch) && (
             <button
-              onClick={() => { setSelectedStatus(''); setSelectedPlan(''); setSelectedTrainer(''); setCurrentPage(1); }}
+              onClick={() => { setSelectedStatus(''); setSelectedPlan(''); setSelectedTrainer(''); setSelectedBranch(''); setCurrentPage(1); }}
               className="border border-white/10 px-sm font-label-bold text-[10px] uppercase text-on-surface/50 hover:text-primary-container hover:border-primary-container/30 transition-colors flex items-center gap-[4px]"
             >
               <span className="material-symbols-outlined text-[14px]">filter_alt_off</span>
@@ -512,6 +540,7 @@ export default function Members() {
               <tr className="border-b border-white/[0.06]">
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Member</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden md:table-cell">Phone</th>
+                <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Branch</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden md:table-cell">Plan</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Trainer</th>
                 <th className="py-sm px-md font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider hidden lg:table-cell">Joined</th>
@@ -544,6 +573,10 @@ export default function Members() {
                     </td>
                     {/* Phone */}
                     <td className="py-sm px-md font-body-md text-[12px] text-on-surface/50 hidden md:table-cell">{member.phone}</td>
+                    {/* Branch */}
+                    <td className="py-sm px-md hidden lg:table-cell">
+                      <span className="font-body-md text-[12px] text-on-surface/50">{member.branchName}</span>
+                    </td>
                     {/* Plan */}
                     <td className="py-sm px-md hidden md:table-cell">
                       <span className="border border-white/10 px-sm py-[3px] font-label-bold text-[9px] uppercase text-on-surface/60 group-hover:border-primary-container/30 group-hover:text-primary-container transition-colors">
@@ -631,9 +664,9 @@ export default function Members() {
                     <div className="flex flex-col items-center gap-sm">
                       <span className="material-symbols-outlined text-on-surface/15 text-[40px]">person_off</span>
                       <p className="font-label-bold text-[11px] text-on-surface/25 uppercase tracking-wider">
-                        {searchTerm || selectedStatus || selectedPlan || selectedTrainer ? 'No matching members found' : 'No members yet'}
+                        {searchTerm || selectedStatus || selectedPlan || selectedTrainer || selectedBranch ? 'No matching members found' : 'No members yet'}
                       </p>
-                      {!searchTerm && !selectedStatus && !selectedPlan && !selectedTrainer && (
+                      {!searchTerm && !selectedStatus && !selectedPlan && !selectedTrainer && !selectedBranch && (
                         <button
                           onClick={openAddForm}
                           className="font-label-bold text-[10px] text-primary-container uppercase border-b border-primary-container/30 hover:border-primary-container transition-colors pb-[2px]"
@@ -820,6 +853,22 @@ export default function Members() {
                       <option value="" className="bg-[#1A1A1A] text-white">No Plan Selected</option>
                       {plans.map(p => (
                         <option key={p.id} value={p.id} className="bg-[#1A1A1A] text-white">{p.name} - ₹{p.price}/{p.duration}</option>
+                      ))}
+                    </select>
+                    <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
+                  </div>
+                </div>
+                {/* Branch */}
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Select Branch</label>
+                  <div className="relative">
+                    <select
+                      value={branchId} onChange={(e) => setBranchId(e.target.value)}
+                      className="w-full bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none transition-all font-body-md appearance-none"
+                    >
+                      <option value="" className="bg-[#1A1A1A] text-white">No Branch Selected</option>
+                      {branches.map(b => (
+                        <option key={b.id} value={b.id} className="bg-[#1A1A1A] text-white">{b.name}</option>
                       ))}
                     </select>
                     <span className="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface/20 text-[18px]">expand_more</span>
