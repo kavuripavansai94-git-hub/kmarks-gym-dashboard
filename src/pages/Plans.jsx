@@ -160,13 +160,12 @@ export default function Plans() {
   };
 
   const getPlanStats = () => {
-    const activeSubscribers = members.filter(m => computeMemberStatus(m.membership_end) === 'Active');
-    
-    // Count active members per plan ID
+    // Count all members per plan ID
     const planCounts = {};
-    activeSubscribers.forEach(m => {
+    members.forEach(m => {
       if (m.plan_id) {
-        planCounts[m.plan_id] = (planCounts[m.plan_id] || 0) + 1;
+        const pId = String(m.plan_id);
+        planCounts[pId] = (planCounts[pId] || 0) + 1;
       }
     });
 
@@ -174,7 +173,7 @@ export default function Plans() {
     let maxCount = -1;
     let popularPlanName = 'None';
     plans.forEach(p => {
-      const count = planCounts[p.id] || 0;
+      const count = planCounts[String(p.id)] || 0;
       if (count > maxCount && count > 0) {
         maxCount = count;
         popularPlanName = p.name;
@@ -183,7 +182,7 @@ export default function Plans() {
 
     const totalPackages = plans.length;
     const avgPrice = plans.length ? plans.reduce((sum, p) => sum + Number(p.price || 0), 0) / plans.length : 0;
-    const totalSubscribed = activeSubscribers.filter(m => m.plan_id).length;
+    const totalSubscribed = members.filter(m => m.plan_id).length;
 
     return {
       totalPackages,
@@ -502,7 +501,7 @@ export default function Plans() {
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
           {plans.map((plan) => {
             const parsed = parsePlanDescription(plan);
-            const activeCount = stats.planCounts[plan.id] || 0;
+            const activeCount = stats.planCounts[String(plan.id)] || 0;
             const isLocal = String(plan.id).startsWith('local_');
 
             return (
@@ -591,7 +590,7 @@ export default function Plans() {
                 <div className="bg-surface-container-low border-t border-white/[0.03] py-sm px-md flex items-center justify-between text-[11px]">
                   <span className="font-label-bold uppercase text-on-surface/40">Active Subscribers</span>
                   <span className={`font-label-bold px-sm py-[1px] rounded-full uppercase ${activeCount > 0 ? 'bg-primary-container/10 text-primary-container' : 'bg-white/5 text-on-surface/30'}`}>
-                    {activeCount} {activeCount === 1 ? 'member' : 'members'}
+                    {activeCount} members on this plan
                   </span>
                 </div>
               </div>
