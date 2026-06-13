@@ -337,7 +337,7 @@ function Enquiries() {
                     )}
                   </td>
                   <td className="p-sm text-right">
-                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-end gap-1">
                       {enq.status !== 'Converted' && (
                         <button 
                           onClick={() => handleConvertToMember(enq.id, enq)}
