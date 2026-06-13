@@ -68,10 +68,12 @@ function Enquiries() {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-lg gap-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-sm border border-white/5 bg-gradient-to-br from-surface-container via-surface-container-high to-surface-container p-md relative overflow-hidden mb-lg">
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
         <div>
-          <h1 className="text-3xl font-heading font-bold text-on-surface mb-xs">Enquiries & Leads</h1>
-          <p className="text-on-surface/60 font-body text-sm">Manage potential members and track conversions.</p>
+          <p className="font-label-bold text-[10px] text-primary-container uppercase tracking-[0.3em] mb-xs">Lead Management</p>
+          <h1 className="text-3xl font-heading font-bold text-on-surface uppercase tracking-tight">Enquiries & Leads</h1>
+          <p className="text-on-surface/60 font-body text-sm mt-1">Manage potential members and track conversions.</p>
         </div>
         <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center justify-center gap-xs">
           <span className="material-symbols-outlined text-[20px]">add</span>
