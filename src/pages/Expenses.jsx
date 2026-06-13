@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const MOCK_EXPENSES = [
-  { id: 1, date: '2023-10-01', category: 'Rent', description: 'Monthly Gym Rent', amount: 5000, status: 'Paid' },
-  { id: 2, date: '2023-10-05', category: 'Equipment', description: 'New Dumbbells', amount: 850, status: 'Paid' },
-  { id: 3, date: '2023-10-10', category: 'Utilities', description: 'Electricity Bill', amount: 420, status: 'Pending' },
-  { id: 4, date: '2023-10-15', category: 'Marketing', description: 'Instagram Ads', amount: 300, status: 'Paid' },
-  { id: 5, date: '2023-10-18', category: 'Maintenance', description: 'Treadmill Repair', amount: 150, status: 'Overdue' },
-  { id: 6, date: '2023-10-25', category: 'Salary', description: 'Staff Salaries', amount: 3200, status: 'Pending' },
+  { id: 1, date: '01 Oct 2023', category: 'Rent', description: 'Monthly Gym Rent', amount: 5000, status: 'Paid' },
+  { id: 2, date: '05 Oct 2023', category: 'Equipment', description: 'New Dumbbells', amount: 850, status: 'Paid' },
+  { id: 3, date: '10 Oct 2023', category: 'Utilities', description: 'Electricity Bill', amount: 420, status: 'Pending' },
+  { id: 4, date: '15 Oct 2023', category: 'Marketing', description: 'Instagram Ads', amount: 300, status: 'Paid' },
+  { id: 5, date: '18 Oct 2023', category: 'Maintenance', description: 'Treadmill Repair', amount: 150, status: 'Overdue' },
+  { id: 6, date: '25 Oct 2023', category: 'Salary', description: 'Staff Salaries', amount: 3200, status: 'Pending' },
 ];
 
 function Expenses() {
   const [expenses, setExpenses] = useState(MOCK_EXPENSES);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
+  const [showBanner, setShowBanner] = useState(true);
 
   const filteredExpenses = expenses.filter(exp => {
     const matchesSearch = exp.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -36,6 +37,16 @@ function Expenses() {
       animate={{ opacity: 1, y: 0 }}
       className="p-gutter pb-32"
     >
+      {showBanner && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 px-md py-sm font-label-bold text-[11px] uppercase flex justify-between items-center mb-md animate-[slideDown_0.3s_ease]">
+          <div className="flex items-center gap-sm">
+            <span className="material-symbols-outlined text-[16px]">info</span>
+            <span>This feature is being connected to the database. Data shown is for preview only.</span>
+          </div>
+          <button onClick={() => setShowBanner(false)} className="material-symbols-outlined text-[16px] hover:text-white transition-colors">close</button>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-lg gap-sm">
         <div>
           <h1 className="text-3xl font-heading font-bold text-on-surface mb-xs">Expenses Tracker</h1>
@@ -59,7 +70,7 @@ function Expenses() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Total Monthly Expenses</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">$9,920</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">₹9,920</h2>
             </div>
           </div>
           <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
@@ -78,7 +89,7 @@ function Expenses() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Paid</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">$6,150</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">₹6,150</h2>
             </div>
           </div>
           <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
@@ -99,7 +110,7 @@ function Expenses() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Pending</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">$3,620</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">₹3,620</h2>
             </div>
           </div>
           <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
@@ -118,7 +129,7 @@ function Expenses() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Overdue</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">$150</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">₹150</h2>
             </div>
           </div>
           <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
@@ -193,7 +204,7 @@ function Expenses() {
                     <span className="font-bold text-on-surface text-sm">{exp.description}</span>
                   </td>
                   <td className="p-sm">
-                    <span className="font-bold text-primary-container text-sm">${exp.amount.toLocaleString()}</span>
+                    <span className="font-bold text-primary-container text-sm">₹{exp.amount.toLocaleString()}</span>
                   </td>
                   <td className="p-sm">
                     <span className={`inline-block px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(exp.status)}`}>
