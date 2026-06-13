@@ -1,16 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 
 const MOCK_BRANCHES = [
-  { id: 1, name: "K Mark's Gym - Downtown", location: 'Downtown City Center', manager: 'Sarah Connor', status: 'Active', contact: '+1 234 567 8901', members: 450, staff: 12 },
-  { id: 2, name: "K Mark's Gym - Westside", location: 'Westside Plaza', manager: 'Mike Tyson', status: 'Active', contact: '+1 234 567 8902', members: 320, staff: 8 },
-  { id: 3, name: "K Mark's Gym - North Park", location: 'North Park Ave', manager: 'Emily Blunt', status: 'Setup', contact: '+1 234 567 8903', members: 0, staff: 3 },
-  { id: 4, name: "K Mark's Gym - East End", location: 'East End Industrial', manager: 'John Matrix', status: 'Maintenance', contact: '+1 234 567 8904', members: 210, staff: 6 },
+  { id: 1, name: "K Mark's Gym", location: 'Guntur, Andhra Pradesh', manager: 'Admin', status: 'Active', contact: '' },
 ];
 
 function Branches() {
   const [branches, setBranches] = useState(MOCK_BRANCHES);
   const [searchTerm, setSearchTerm] = useState('');
+  const [totalMembers, setTotalMembers] = useState(0);
+  const [totalStaff, setTotalStaff] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [membersRes, trainersRes] = await Promise.all([
+          api.get('/api/members'),
+          api.get('/api/trainers')
+        ]);
+        setTotalMembers(membersRes.data.members?.length || 0);
+        setTotalStaff(trainersRes.data.trainers?.length || 0);
+      } catch (err) {
+        console.error('Failed to fetch stats', err);
+      }
+    };
+    fetchData();
+  }, []);
 
   const filteredBranches = branches.filter(branch => 
     branch.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -28,8 +44,6 @@ function Branches() {
 
   const totalBranches = branches.length;
   const activeBranches = branches.filter(b => b.status === 'Active').length;
-  const totalMembers = branches.reduce((sum, branch) => sum + branch.members, 0);
-  const totalStaff = branches.reduce((sum, branch) => sum + branch.staff, 0);
 
   return (
     <motion.div 
@@ -209,6 +223,10 @@ function Branches() {
           </table>
         </div>
       </section>
+
+      <div className="mt-md flex justify-center">
+        <p className="font-label-bold text-[11px] text-on-surface/40 uppercase tracking-wider">Multi-branch support coming soon.</p>
+      </div>
     </motion.div>
   );
 }
