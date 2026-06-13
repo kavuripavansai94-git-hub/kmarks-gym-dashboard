@@ -409,7 +409,7 @@ export default function DashboardHome() {
                 </div>
               </div>
               <div className="flex items-center justify-between mt-sm relative z-10 h-[24px]">
-                <SparkBars data={memberWeekData} height={24} />
+                <SparkBars data={[0,0,0,0,0,0,totalMembers]} height={24} />
                 <span className="font-label-bold text-[10px] text-green-500 uppercase flex items-center gap-[2px]">
                   <span className="material-symbols-outlined text-[14px]">trending_up</span>
                   Active
@@ -433,7 +433,7 @@ export default function DashboardHome() {
                 </div>
               </div>
               <div className="flex items-center justify-between mt-sm relative z-10 h-[24px]">
-                <SparkBars data={attendanceWeekData} color="#4ade80" height={24} />
+                <SparkBars data={weeklyActivity} color="#4ade80" height={24} />
                 <span className="font-label-bold text-[10px] text-on-surface/40 uppercase">
                   {Math.round((activeToday / Math.max(totalMembers, 1)) * 100)}% rate
                 </span>
