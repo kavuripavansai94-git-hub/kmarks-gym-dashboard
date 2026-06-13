@@ -7,10 +7,26 @@ export default function Settings() {
   const [error, setError] = useState(null);
 
   // SECTION 1: Gym Information
-  const [gymName, setGymName] = useState("K Mark's Gym");
-  const [address, setAddress] = useState("123 Iron Avenue, Muscle City, MC 90001");
-  const [phone, setPhone] = useState("+1 (555) 123-4567");
-  const [email, setEmail] = useState("admin@kmarks.com");
+  const [gymName, setGymName] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kmarks_gym_settings');
+    if (saved) {
+      const data = JSON.parse(saved);
+      setGymName(data.gymName || "K Mark's Gym");
+      setAddress(data.address || "Guntur, Andhra Pradesh, India");
+      setPhone(data.phone || "");
+      setEmail(data.email || "admin@kmarks.com");
+    } else {
+      setGymName("K Mark's Gym");
+      setAddress("Guntur, Andhra Pradesh, India");
+      setPhone("");
+      setEmail("admin@kmarks.com");
+    }
+  }, []);
 
   // SECTION 2: Plans Management
   const [plans, setPlans] = useState([]);
@@ -64,26 +80,35 @@ export default function Settings() {
   const handleSaveGymInfo = (e) => {
     e.preventDefault();
     setLoading(true);
+    const data = { gymName, address, phone, email };
+    localStorage.setItem('kmarks_gym_settings', JSON.stringify(data));
     setTimeout(() => {
       setLoading(false);
-      notify("Gym information updated successfully!");
+      notify("Settings saved successfully");
     }, 800);
   };
 
-  const handleSavePassword = (e) => {
+  const handleSavePassword = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       notify("New passwords do not match.", true);
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await api.put('/api/auth/change-password', {
+        currentPassword,
+        newPassword
+      });
+      notify("Password updated successfully!");
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      notify("Password updated successfully!");
-    }, 800);
+    } catch (err) {
+      notify(err.response?.data?.error || "Failed to update password", true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddPlan = async (e) => {
@@ -336,7 +361,7 @@ export default function Settings() {
           <div className="pt-sm">
             <button
               type="submit" disabled={loading}
-              className="border border-white/20 text-white font-label-bold text-[11px] px-lg py-md uppercase hover:bg-white hover:text-black transition-colors disabled:opacity-50"
+              className="bg-primary-container text-black font-label-bold text-[11px] px-lg py-md uppercase hover:bg-white transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] active:translate-x-1 active:translate-y-1 active:shadow-none disabled:opacity-50"
             >
               {loading ? 'Updating...' : 'Update Password'}
             </button>
