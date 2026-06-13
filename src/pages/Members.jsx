@@ -168,7 +168,7 @@ export default function Members() {
   const displayMembers = members.map((m) => {
     const user = m.users || {};
     const td = trainers.find(t => String(t.id) === String(m.assigned_trainer_id));
-    const plan = plans.find(p => p.id === m.plan_id);
+    const plan = plans.find(p => String(p.id) === String(m.plan_id));
     return {
       id: m.id, name: user.name || 'Unknown', email: user.email || '',
       phone: user.phone || '-', trainer: td?.users?.name || td?.name || 'Self-Trained',

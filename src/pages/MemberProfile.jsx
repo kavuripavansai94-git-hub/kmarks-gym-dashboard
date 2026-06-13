@@ -23,6 +23,7 @@ export default function MemberProfile() {
   
   const [member, setMember] = useState(null);
   const [trainers, setTrainers] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [dietPlans, setDietPlans] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -94,7 +95,8 @@ export default function MemberProfile() {
         safeFetch(`/api/payments?member_id=${id}`, setPayments, 'payments'),
         safeFetch(`/api/attendance?member_id=${id}`, setAttendance, 'attendance'),
         safeFetch(`/api/progress?member_id=${id}`, setProgress, 'progress'),
-        safeFetch(`/api/trainers`, setTrainers, 'trainers')
+        safeFetch(`/api/trainers`, setTrainers, 'trainers'),
+        safeFetch(`/api/plans`, setPlans, 'plans')
       ]);
 
     } catch (err) {
@@ -143,6 +145,12 @@ export default function MemberProfile() {
     }
   } else if (member.trainers?.users?.name) {
     trainerName = member.trainers.users.name;
+  }
+
+  let planName = 'No Plan';
+  if (member.plan_id) {
+    const p = plans.find(plan => String(plan.id) === String(member.plan_id));
+    if (p) planName = p.name;
   }
   
   // Status & Days
@@ -218,9 +226,9 @@ export default function MemberProfile() {
                   }`}></span>
                   {status}
                 </span>
-                {member.plans?.name && (
+                {planName !== 'No Plan' && (
                   <span className="font-label-bold text-[9px] uppercase bg-white/5 border border-white/10 px-sm py-[3px] text-on-surface">
-                    {member.plans.name}
+                    {planName}
                   </span>
                 )}
               </div>
