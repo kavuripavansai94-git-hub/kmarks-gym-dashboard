@@ -81,6 +81,12 @@ export default function Members() {
   const location = useLocation();
   useEffect(() => {
     const params = new URLSearchParams(location.search);
+    
+    const branchQuery = params.get('branch_id');
+    if (branchQuery) {
+      setSelectedBranch(branchQuery);
+    }
+
     const editId = params.get('edit');
     if (editId && members.length > 0 && !isFormOpen) {
       const rawMember = members.find(m => m.id === editId);

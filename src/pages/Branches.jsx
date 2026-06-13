@@ -22,6 +22,10 @@ function Branches() {
   const [location, setLocation] = useState('');
   const [status, setStatus] = useState('ACTIVE');
   const [managerId, setManagerId] = useState('');
+  const [maxCapacity, setMaxCapacity] = useState('500');
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [address, setAddress] = useState('');
   const [trainers, setTrainers] = useState([]);
 
   useEffect(() => {
@@ -56,6 +60,10 @@ function Branches() {
     setLocation('');
     setStatus('ACTIVE');
     setManagerId('');
+    setMaxCapacity('500');
+    setContactPhone('');
+    setContactEmail('');
+    setAddress('');
     setIsModalOpen(true);
   };
 
@@ -65,6 +73,10 @@ function Branches() {
     setLocation(branch.location || '');
     setStatus(branch.status || 'ACTIVE');
     setManagerId(branch.manager_id || '');
+    setMaxCapacity(branch.max_capacity?.toString() || '500');
+    setContactPhone(branch.contact_phone || '');
+    setContactEmail(branch.contact_email || '');
+    setAddress(branch.address || '');
     setIsModalOpen(true);
   };
 
@@ -75,7 +87,11 @@ function Branches() {
         name,
         location,
         status,
-        manager_id: managerId || null
+        manager_id: managerId || null,
+        max_capacity: maxCapacity,
+        contact_phone: contactPhone,
+        contact_email: contactEmail,
+        address
       };
 
       if (editingBranch) {
@@ -176,10 +192,24 @@ function Branches() {
             </div>
           </div>
           <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
-            <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-green-500 w-[50%] h-full rounded-full"></div>
-            </div>
-            <span className="text-green-500 text-xs font-bold whitespace-nowrap">50% Utilization</span>
+          <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
+            {activeBranches > 0 ? (
+              <div className="w-full flex items-center gap-2">
+                <div className="flex-1 bg-white/5 h-1.5 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-green-500 h-full rounded-full" 
+                    style={{ 
+                      width: `${Math.min(100, (branches.reduce((sum, b) => sum + (b.member_count || 0), 0) / branches.reduce((sum, b) => sum + (b.max_capacity || 500), 0)) * 100)}%` 
+                    }}
+                  ></div>
+                </div>
+                <span className="text-green-500 text-[10px] font-bold whitespace-nowrap">
+                  {Math.round((branches.reduce((sum, b) => sum + (b.member_count || 0), 0) / Math.max(1, branches.reduce((sum, b) => sum + (b.max_capacity || 500), 0))) * 100)}% Utilized
+                </span>
+              </div>
+            ) : (
+              <span className="text-on-surface/40 text-xs">No active branches</span>
+            )}
           </div>
         </div>
 
@@ -252,6 +282,7 @@ function Branches() {
                 <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Manager</th>
                 <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Status</th>
                 <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Contact</th>
+                <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Revenue (30d)</th>
                 <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40 text-right">Actions</th>
               </tr>
             </thead>
@@ -276,9 +307,24 @@ function Branches() {
                       {branch.status}
                     </span>
                   </td>
-                  <td className="p-sm text-sm text-on-surface/70">{branch.contact}</td>
+                  <td className="p-sm">
+                    <div className="flex flex-col text-xs text-on-surface/70">
+                      <span>{branch.contact_phone || 'No phone'}</span>
+                      <span className="opacity-50">{branch.contact_email || 'No email'}</span>
+                    </div>
+                  </td>
+                  <td className="p-sm text-sm font-bold text-green-500">
+                    ₹{(branch.monthly_revenue || 0).toLocaleString()}
+                  </td>
                   <td className="p-sm text-right">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => window.location.href = `/members?branch_id=${branch.id}`}
+                        className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-white/10 hover:text-cyan-500 transition-colors" 
+                        title="View Members"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">groups</span>
+                      </button>
                       <button onClick={() => openEditForm(branch)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-white/10 hover:text-primary-container transition-colors" title="Edit">
                         <span className="material-symbols-outlined text-[16px]">edit</span>
                       </button>
@@ -360,18 +406,63 @@ function Branches() {
                 </select>
               </div>
 
+              <div className="grid grid-cols-2 gap-md">
+                <div>
+                  <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Contact Phone</label>
+                  <input 
+                    type="text" 
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
+                    placeholder="e.g. +91 98765 43210"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Contact Email</label>
+                  <input 
+                    type="email" 
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
+                    placeholder="e.g. hello@gym.com"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Manager</label>
-                <select
-                  value={managerId}
-                  onChange={(e) => setManagerId(e.target.value)}
-                  className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
-                >
-                  <option value="">-- Unassigned --</option>
-                  {trainers.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
+                <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Full Address</label>
+                <textarea 
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50 resize-none h-[60px]"
+                  placeholder="e.g. 123 Main St, Hyderabad"
+                ></textarea>
+              </div>
+
+              <div className="grid grid-cols-2 gap-md">
+                <div>
+                  <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Manager</label>
+                  <select
+                    value={managerId}
+                    onChange={(e) => setManagerId(e.target.value)}
+                    className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
+                  >
+                    <option value="">-- Unassigned --</option>
+                    {trainers.map(t => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Max Capacity</label>
+                  <input 
+                    type="number" 
+                    value={maxCapacity}
+                    onChange={(e) => setMaxCapacity(e.target.value)}
+                    className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
+                    placeholder="e.g. 500"
+                  />
+                </div>
               </div>
 
               <div className="flex gap-sm mt-sm">
