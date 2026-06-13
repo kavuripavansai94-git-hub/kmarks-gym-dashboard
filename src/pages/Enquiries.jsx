@@ -88,6 +88,40 @@ function Enquiries() {
     }
   };
 
+  const handleLogContact = async (id, currentLead) => {
+    try {
+      const updatedTime = new Date().toISOString();
+      const response = await api.put(`/api/leads/${id}`, { last_contacted_at: updatedTime });
+      const updatedLead = response.data.lead;
+      setEnquiries(enquiries.map(e => e.id === id ? updatedLead : e));
+    } catch (error) {
+      console.error('Failed to log contact', error);
+    }
+  };
+
+  const handleConvertToMember = async (id, currentLead) => {
+    if (!window.confirm(`Convert ${currentLead.name} to a Member?`)) return;
+    try {
+      // 1. Create member in database (requires minimal info)
+      const payload = {
+        name: currentLead.name,
+        phone: currentLead.phone,
+        email: `${currentLead.name.replace(/\s+/g, '').toLowerCase()}@example.com`,
+        gender: 'Male', // Default
+      };
+      await api.post('/api/members', payload);
+
+      // 2. Mark lead as Converted
+      const response = await api.put(`/api/leads/${id}`, { status: 'Converted' });
+      const updatedLead = response.data.lead;
+      setEnquiries(enquiries.map(e => e.id === id ? updatedLead : e));
+      alert(`${currentLead.name} was successfully converted to a Member!`);
+    } catch (error) {
+      console.error('Failed to convert lead', error);
+      alert('Failed to convert lead to member.');
+    }
+  };
+
   const filteredEnquiries = enquiries.filter(enq => {
     const matchesSearch = enq.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           enq.phone.includes(searchTerm);
@@ -97,11 +131,12 @@ function Enquiries() {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'New': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'Contacted': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'Trial': return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+      case 'Hot': return 'bg-error/10 text-error border-error/20';
+      case 'Warm': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+      case 'Cold': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      case 'New': return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
       case 'Converted': return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'Lost': return 'bg-error/10 text-error border-error/20';
+      case 'Lost': return 'bg-surface-variant text-on-surface/50 border-white/10';
       default: return 'bg-surface-variant text-on-surface border-white/10';
     }
   };
@@ -221,8 +256,9 @@ function Enquiries() {
             >
               <option value="All">All Statuses</option>
               <option value="New">New</option>
-              <option value="Contacted">Contacted</option>
-              <option value="Trial">Trial</option>
+              <option value="Hot">Hot</option>
+              <option value="Warm">Warm</option>
+              <option value="Cold">Cold</option>
               <option value="Converted">Converted</option>
               <option value="Lost">Lost</option>
             </select>
@@ -239,7 +275,7 @@ function Enquiries() {
                 <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Source</th>
                 <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Status</th>
                 <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Date Added</th>
-                <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Follow-up</th>
+                <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40">Last Contacted</th>
                 <th className="p-sm font-label-bold text-[11px] uppercase tracking-wider text-on-surface/40 text-right">Actions</th>
               </tr>
             </thead>
@@ -274,8 +310,9 @@ function Enquiries() {
                       className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border outline-none cursor-pointer appearance-none ${getStatusColor(enq.status)}`}
                     >
                       <option value="New">New</option>
-                      <option value="Contacted">Contacted</option>
-                      <option value="Trial">Trial</option>
+                      <option value="Hot">Hot</option>
+                      <option value="Warm">Warm</option>
+                      <option value="Cold">Cold</option>
                       <option value="Converted">Converted</option>
                       <option value="Lost">Lost</option>
                     </select>
@@ -284,12 +321,37 @@ function Enquiries() {
                     {new Date(enq.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </td>
                   <td className="p-sm text-sm">
-                    <span className={enq.follow_up_date === todayIso ? 'text-yellow-500 font-bold' : 'text-on-surface/70'}>
-                      {enq.follow_up_date ? new Date(enq.follow_up_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '-'}
-                    </span>
+                    {enq.last_contacted_at ? (
+                      <span className="text-on-surface/70">
+                        {Math.floor((new Date() - new Date(enq.last_contacted_at)) / (1000 * 60 * 60 * 24))} days ago
+                      </span>
+                    ) : (
+                      <span className="text-on-surface/30">-</span>
+                    )}
+                    {enq.follow_up_date && (
+                      <div className={`text-[10px] mt-1 ${enq.follow_up_date === todayIso ? 'text-yellow-500 font-bold' : 'text-on-surface/50'}`}>
+                        Follow-up: {new Date(enq.follow_up_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                      </div>
+                    )}
                   </td>
                   <td className="p-sm text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {enq.status !== 'Converted' && (
+                        <button 
+                          onClick={() => handleConvertToMember(enq.id, enq)}
+                          className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-green-500/20 hover:text-green-500 transition-colors"
+                          title="Convert to Member"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">person_add</span>
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => handleLogContact(enq.id, enq)}
+                        className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-yellow-500/20 hover:text-yellow-500 transition-colors"
+                        title="Log Contact (Now)"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">call</span>
+                      </button>
                       <button 
                         onClick={() => handleDeleteLead(enq.id)}
                         className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-error/20 hover:text-error transition-colors"
@@ -355,8 +417,9 @@ function Enquiries() {
                     <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Status</label>
                     <select value={status} onChange={e => setStatus(e.target.value)} className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none w-full">
                       <option value="New">New</option>
-                      <option value="Contacted">Contacted</option>
-                      <option value="Trial">Trial</option>
+                      <option value="Hot">Hot</option>
+                      <option value="Warm">Warm</option>
+                      <option value="Cold">Cold</option>
                       <option value="Converted">Converted</option>
                       <option value="Lost">Lost</option>
                     </select>
