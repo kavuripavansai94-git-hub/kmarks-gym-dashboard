@@ -192,7 +192,6 @@ function Branches() {
             </div>
           </div>
           <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
-          <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
             {activeBranches > 0 ? (
               <div className="w-full flex items-center gap-2">
                 <div className="flex-1 bg-white/5 h-1.5 rounded-full overflow-hidden">
