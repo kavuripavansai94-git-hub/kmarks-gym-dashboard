@@ -7,26 +7,103 @@ const MOCK_BRANCHES = [
 ];
 
 function Branches() {
-  const [branches, setBranches] = useState(MOCK_BRANCHES);
+  const [branches, setBranches] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalMembers, setTotalMembers] = useState(0);
   const [totalStaff, setTotalStaff] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingBranch, setEditingBranch] = useState(null);
+  
+  // Form State
+  const [name, setName] = useState('');
+  const [location, setLocation] = useState('');
+  const [status, setStatus] = useState('ACTIVE');
+  const [managerId, setManagerId] = useState('');
+  const [trainers, setTrainers] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [membersRes, trainersRes] = await Promise.all([
-          api.get('/api/members'),
-          api.get('/api/trainers')
-        ]);
-        setTotalMembers(membersRes.data.members?.length || 0);
-        setTotalStaff(trainersRes.data.trainers?.length || 0);
-      } catch (err) {
-        console.error('Failed to fetch stats', err);
-      }
-    };
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [membersRes, trainersRes, branchesRes] = await Promise.all([
+        api.get('/api/members'),
+        api.get('/api/trainers'),
+        api.get('/api/branches')
+      ]);
+      setTotalMembers(membersRes.data.members?.length || 0);
+      
+      const fetchedTrainers = trainersRes.data.trainers || [];
+      setTotalStaff(fetchedTrainers.length);
+      setTrainers(fetchedTrainers);
+
+      setBranches(branchesRes.data.branches || []);
+    } catch (err) {
+      console.error('Failed to fetch stats', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openAddForm = () => {
+    setEditingBranch(null);
+    setName('');
+    setLocation('');
+    setStatus('ACTIVE');
+    setManagerId('');
+    setIsModalOpen(true);
+  };
+
+  const openEditForm = (branch) => {
+    setEditingBranch(branch);
+    setName(branch.name);
+    setLocation(branch.location || '');
+    setStatus(branch.status || 'ACTIVE');
+    setManagerId(branch.manager_id || '');
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        name,
+        location,
+        status,
+        manager_id: managerId || null
+      };
+
+      if (editingBranch) {
+        const res = await api.put(`/api/branches/${editingBranch.id}`, payload);
+        const updated = res.data.branch;
+        setBranches(branches.map(b => b.id === updated.id ? updated : b));
+      } else {
+        const res = await api.post('/api/branches', payload);
+        const created = res.data.branch;
+        setBranches([...branches, created]);
+      }
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Failed to save branch', err);
+      alert('Failed to save branch.');
+    }
+  };
+
+  const handleDelete = async (id, branchName) => {
+    if (!window.confirm(`Delete branch ${branchName}? This cannot be undone.`)) return;
+    try {
+      await api.delete(`/api/branches/${id}`);
+      setBranches(branches.filter(b => b.id !== id));
+    } catch (err) {
+      console.error('Failed to delete branch', err);
+      alert('Failed to delete branch.');
+    }
+  };
 
   const filteredBranches = branches.filter(branch => 
     branch.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -34,16 +111,16 @@ function Branches() {
   );
 
   const getStatusColor = (status) => {
-    switch(status) {
-      case 'Active': return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'Setup': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'Maintenance': return 'bg-error/10 text-error border-error/20';
+    switch(status?.toUpperCase()) {
+      case 'ACTIVE': return 'bg-green-500/10 text-green-500 border-green-500/20';
+      case 'SETUP': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+      case 'MAINTENANCE': return 'bg-error/10 text-error border-error/20';
       default: return 'bg-surface-variant text-on-surface border-white/10';
     }
   };
 
   const totalBranches = branches.length;
-  const activeBranches = branches.filter(b => b.status === 'Active').length;
+  const activeBranches = branches.filter(b => b.status?.toUpperCase() === 'ACTIVE').length;
 
   return (
     <motion.div 
@@ -58,7 +135,7 @@ function Branches() {
           <h1 className="text-3xl font-heading font-bold text-on-surface uppercase tracking-tight">Branches</h1>
           <p className="text-on-surface/60 font-body text-sm mt-1">Manage all gym locations from one place.</p>
         </div>
-        <button className="bg-primary-container text-on-primary font-label-bold text-[12px] px-md py-sm uppercase hover:brightness-110 active:scale-95 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] flex items-center justify-center gap-xs">
+        <button onClick={openAddForm} className="bg-primary-container text-on-primary font-label-bold text-[12px] px-md py-sm uppercase hover:brightness-110 active:scale-95 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] flex items-center justify-center gap-xs">
           <span className="material-symbols-outlined text-[18px]">add</span>
           Add Branch
         </button>
@@ -193,7 +270,7 @@ function Branches() {
                     </div>
                   </td>
                   <td className="p-sm text-sm text-on-surface/70">{branch.location}</td>
-                  <td className="p-sm text-sm text-on-surface/70">{branch.manager}</td>
+                  <td className="p-sm text-sm text-on-surface/70">{branch.manager_name || 'Unassigned'}</td>
                   <td className="p-sm">
                     <span className={`inline-block px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(branch.status)}`}>
                       {branch.status}
@@ -202,11 +279,11 @@ function Branches() {
                   <td className="p-sm text-sm text-on-surface/70">{branch.contact}</td>
                   <td className="p-sm text-right">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-white/10 hover:text-primary-container transition-colors">
-                        <span className="material-symbols-outlined text-[16px]">visibility</span>
-                      </button>
-                      <button className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-white/10 hover:text-green-500 transition-colors">
+                      <button onClick={() => openEditForm(branch)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-white/10 hover:text-primary-container transition-colors" title="Edit">
                         <span className="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                      <button onClick={() => handleDelete(branch.id, branch.name)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface hover:bg-error/20 hover:text-error transition-colors" title="Delete">
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
                       </button>
                     </div>
                   </td>
@@ -226,9 +303,96 @@ function Branches() {
         </div>
       </section>
 
-      <div className="mt-md flex justify-center">
-        <p className="font-label-bold text-[11px] text-on-surface/40 uppercase tracking-wider">Multi-branch support coming soon.</p>
-      </div>
+      {/* ADD/EDIT MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-sm bg-background/80 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md bg-surface-container border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+          >
+            <div className="p-md border-b border-white/10 flex justify-between items-center bg-surface/50">
+              <h2 className="font-heading font-bold text-lg text-on-surface">
+                {editingBranch ? 'Edit Branch' : 'Add New Branch'}
+              </h2>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-on-surface/60 transition-colors"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-md flex flex-col gap-md">
+              <div>
+                <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Branch Name *</label>
+                <input 
+                  type="text" 
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
+                  placeholder="e.g. K Mark's Gym - Downtown"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Location</label>
+                <input 
+                  type="text" 
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
+                  placeholder="e.g. Hyderabad, TS"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Status</label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="SETUP">Setup</option>
+                  <option value="MAINTENANCE">Maintenance</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-label-bold uppercase tracking-wider text-on-surface/60 mb-xs">Manager</label>
+                <select
+                  value={managerId}
+                  onChange={(e) => setManagerId(e.target.value)}
+                  className="w-full bg-surface border border-white/10 rounded-lg py-2 px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50"
+                >
+                  <option value="">-- Unassigned --</option>
+                  {trainers.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex gap-sm mt-sm">
+                <button 
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 bg-surface border border-white/10 text-on-surface font-label-bold text-[12px] py-sm uppercase rounded-lg hover:bg-white/5 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 bg-primary-container text-on-primary font-label-bold text-[12px] py-sm uppercase rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(255,215,0,0.3)]"
+                >
+                  {editingBranch ? 'Save Changes' : 'Create Branch'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   );
 }
