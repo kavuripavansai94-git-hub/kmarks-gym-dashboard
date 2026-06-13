@@ -1,19 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const MOCK_ENQUIRIES = [
-  { id: 1, name: 'John Doe', phone: '+1 234 567 8900', source: 'Instagram', status: 'New', date: '2023-10-25', followUp: '2023-10-26' },
-  { id: 2, name: 'Jane Smith', phone: '+1 987 654 3210', source: 'Walk-in', status: 'Contacted', date: '2023-10-24', followUp: '2023-10-27' },
-  { id: 3, name: 'Mike Johnson', phone: '+1 555 123 4567', source: 'Website', status: 'Trial', date: '2023-10-22', followUp: '2023-10-25' },
-  { id: 4, name: 'Sarah Williams', phone: '+1 444 987 6543', source: 'Referral', status: 'Converted', date: '2023-10-20', followUp: '-' },
-  { id: 5, name: 'Chris Brown', phone: '+1 333 456 7890', source: 'Instagram', status: 'Lost', date: '2023-10-18', followUp: '-' },
-  { id: 6, name: 'Emma Davis', phone: '+1 222 345 6789', source: 'Website', status: 'New', date: '2023-10-26', followUp: '2023-10-27' },
-];
-
 function Enquiries() {
-  const [enquiries, setEnquiries] = useState(MOCK_ENQUIRIES);
+  const [enquiries, setEnquiries] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [showBanner, setShowBanner] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [source, setSource] = useState('Walk-in');
+  const [status, setStatus] = useState('New');
+  const [notes, setNotes] = useState('');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kmarks_leads');
+    if (saved) setEnquiries(JSON.parse(saved));
+  }, []);
+
+  const handleAddLead = (e) => {
+    e.preventDefault();
+    const newLead = {
+      id: Date.now(),
+      name, phone, source, status, notes,
+      date: new Date().toISOString().split('T')[0],
+      followUp: '-'
+    };
+    const updated = [newLead, ...enquiries];
+    setEnquiries(updated);
+    localStorage.setItem('kmarks_leads', JSON.stringify(updated));
+    setIsModalOpen(false);
+    setName(''); setPhone(''); setSource('Walk-in'); setStatus('New'); setNotes('');
+  };
 
   const filteredEnquiries = enquiries.filter(enq => {
     const matchesSearch = enq.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -39,12 +58,22 @@ function Enquiries() {
       animate={{ opacity: 1, y: 0 }}
       className="p-gutter pb-32"
     >
+      {showBanner && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 px-md py-sm font-label-bold text-[11px] uppercase flex justify-between items-center mb-md animate-[slideDown_0.3s_ease]">
+          <div className="flex items-center gap-sm">
+            <span className="material-symbols-outlined text-[16px]">info</span>
+            <span>Lead tracking database coming soon. You can manually add leads below.</span>
+          </div>
+          <button onClick={() => setShowBanner(false)} className="material-symbols-outlined text-[16px] hover:text-white transition-colors">close</button>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-lg gap-sm">
         <div>
           <h1 className="text-3xl font-heading font-bold text-on-surface mb-xs">Enquiries & Leads</h1>
           <p className="text-on-surface/60 font-body text-sm">Manage potential members and track conversions.</p>
         </div>
-        <button className="btn-primary flex items-center justify-center gap-xs">
+        <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center justify-center gap-xs">
           <span className="material-symbols-outlined text-[20px]">add</span>
           New Lead
         </button>
@@ -62,12 +91,8 @@ function Enquiries() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Total Leads</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">124</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">{enquiries.length}</h2>
             </div>
-          </div>
-          <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
-            <span className="text-green-500 text-xs font-bold">+12%</span>
-            <span className="text-on-surface/40 text-xs">vs last month</span>
           </div>
         </div>
 
@@ -81,14 +106,8 @@ function Enquiries() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Converted</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">45</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">{enquiries.filter(e => e.status === 'Converted').length}</h2>
             </div>
-          </div>
-          <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
-            <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-green-500 w-[36%] h-full rounded-full"></div>
-            </div>
-            <span className="text-green-500 text-xs font-bold whitespace-nowrap">36% Rate</span>
           </div>
         </div>
 
@@ -102,12 +121,8 @@ function Enquiries() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Follow-ups Today</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">12</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">{enquiries.filter(e => e.followUp === new Date().toISOString().split('T')[0]).length}</h2>
             </div>
-          </div>
-          <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
-             <span className="material-symbols-outlined text-yellow-500 text-[16px]">warning</span>
-             <span className="text-on-surface/60 text-xs">Action Required</span>
           </div>
         </div>
 
@@ -121,12 +136,8 @@ function Enquiries() {
           <div className="flex items-center justify-between relative z-10">
             <div>
               <p className="font-label-bold text-on-surface/40 uppercase tracking-wider text-[10px] mb-xs">Lost Leads</p>
-              <h2 className="text-3xl font-heading font-bold text-on-surface">28</h2>
+              <h2 className="text-3xl font-heading font-bold text-on-surface">{enquiries.filter(e => e.status === 'Lost').length}</h2>
             </div>
-          </div>
-          <div className="mt-sm flex items-center gap-xs relative z-10 h-[24px]">
-             <span className="text-error text-xs font-bold">22%</span>
-             <span className="text-on-surface/40 text-xs">Lost Rate</span>
           </div>
         </div>
       </section>
@@ -223,8 +234,8 @@ function Enquiries() {
               {filteredEnquiries.length === 0 && (
                 <tr>
                   <td colSpan="7" className="p-xl text-center text-on-surface/40">
-                    <span className="material-symbols-outlined text-[48px] mb-2 block opacity-50">search_off</span>
-                    <p>No leads found matching your criteria.</p>
+                    <span className="material-symbols-outlined text-[48px] mb-2 block opacity-50">group_add</span>
+                    <p>No leads yet. Add your first lead.</p>
                   </td>
                 </tr>
               )}
@@ -232,6 +243,69 @@ function Enquiries() {
           </table>
         </div>
       </section>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-sm" onClick={(e) => { if (e.target === e.currentTarget) setIsModalOpen(false); }}>
+          <div className="bg-surface-container border border-white/10 w-full max-w-lg relative overflow-hidden shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
+            <div className="h-[2px] bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
+            
+            <div className="p-md lg:p-lg">
+              <div className="flex justify-between items-start mb-md">
+                <h2 className="font-headline-lg text-[24px] text-white uppercase tracking-tight">New Lead</h2>
+                <button onClick={() => setIsModalOpen(false)} className="text-on-surface/30 hover:text-white transition-colors">
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <form onSubmit={handleAddLead} className="space-y-md">
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Full Name *</label>
+                  <input type="text" value={name} onChange={e => setName(e.target.value)} required className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none w-full" />
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Phone *</label>
+                  <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} required className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none w-full" />
+                </div>
+                <div className="grid grid-cols-2 gap-md">
+                  <div className="flex flex-col gap-[6px]">
+                    <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Source</label>
+                    <select value={source} onChange={e => setSource(e.target.value)} className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none w-full">
+                      <option value="Walk-in">Walk-in</option>
+                      <option value="Instagram">Instagram</option>
+                      <option value="Facebook">Facebook</option>
+                      <option value="WhatsApp">WhatsApp</option>
+                      <option value="Referral">Referral</option>
+                      <option value="Website">Website</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-[6px]">
+                    <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Status</label>
+                    <select value={status} onChange={e => setStatus(e.target.value)} className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none w-full">
+                      <option value="New">New</option>
+                      <option value="Contacted">Contacted</option>
+                      <option value="Trial">Trial</option>
+                      <option value="Converted">Converted</option>
+                      <option value="Lost">Lost</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-[6px]">
+                  <label className="font-label-bold text-[10px] uppercase text-on-surface/40 tracking-wider">Notes</label>
+                  <textarea value={notes} onChange={e => setNotes(e.target.value)} className="bg-surface-container-lowest border border-white/10 px-md py-sm text-on-surface text-[13px] focus:border-primary-container/50 focus:ring-0 outline-none w-full h-24 resize-none"></textarea>
+                </div>
+
+                <div className="pt-sm flex justify-end">
+                  <button type="submit" className="bg-primary-container text-black font-label-bold text-[11px] px-lg py-md uppercase hover:bg-white transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] active:translate-x-1 active:translate-y-1 active:shadow-none">
+                    Save Lead
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
