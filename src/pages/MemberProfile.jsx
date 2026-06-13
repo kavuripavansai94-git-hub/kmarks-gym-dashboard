@@ -22,6 +22,7 @@ export default function MemberProfile() {
   const [error, setError] = useState(null);
   
   const [member, setMember] = useState(null);
+  const [trainers, setTrainers] = useState([]);
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [dietPlans, setDietPlans] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -92,7 +93,8 @@ export default function MemberProfile() {
         safeFetch(`/api/diet-plans?member_id=${id}`, setDietPlans, 'dietPlans'),
         safeFetch(`/api/payments?member_id=${id}`, setPayments, 'payments'),
         safeFetch(`/api/attendance?member_id=${id}`, setAttendance, 'attendance'),
-        safeFetch(`/api/progress?member_id=${id}`, setProgress, 'progress')
+        safeFetch(`/api/progress?member_id=${id}`, setProgress, 'progress'),
+        safeFetch(`/api/trainers`, setTrainers, 'trainers')
       ]);
 
     } catch (err) {
@@ -133,7 +135,15 @@ export default function MemberProfile() {
 
   // --- Computations ---
   const user = member.users || {};
-  const trainerName = member.trainers?.users?.name || 'Self-Trained';
+  let trainerName = 'Self-Trained';
+  if (member.assigned_trainer_id) {
+    const t = trainers.find(tr => String(tr.id) === String(member.assigned_trainer_id));
+    if (t) {
+      trainerName = t.users?.name || t.name || 'Unknown Trainer';
+    }
+  } else if (member.trainers?.users?.name) {
+    trainerName = member.trainers.users.name;
+  }
   
   // Status & Days
   const today = new Date(); today.setHours(0,0,0,0);

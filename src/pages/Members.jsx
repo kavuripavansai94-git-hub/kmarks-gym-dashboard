@@ -167,11 +167,11 @@ export default function Members() {
 
   const displayMembers = members.map((m) => {
     const user = m.users || {};
-    const td = trainers.find(t => t.user_id === m.assigned_trainer_id);
+    const td = trainers.find(t => String(t.id) === String(m.assigned_trainer_id));
     const plan = plans.find(p => p.id === m.plan_id);
     return {
       id: m.id, name: user.name || 'Unknown', email: user.email || '',
-      phone: user.phone || '-', trainer: td?.users?.name || 'Self-Trained',
+      phone: user.phone || '-', trainer: td?.users?.name || td?.name || 'Self-Trained',
       planName: plan?.name || 'No Plan',
       joinDate: formatDate(m.joined_at), expiryDate: formatDate(m.membership_end),
       status: computeStatus(m.membership_end), daysLeft: daysRemaining(m.membership_end),
