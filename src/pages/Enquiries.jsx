@@ -125,8 +125,8 @@ function Enquiries() {
           <h1 className="text-3xl font-heading font-bold text-on-surface uppercase tracking-tight">Enquiries & Leads</h1>
           <p className="text-on-surface/60 font-body text-sm mt-1">Manage potential members and track conversions.</p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center justify-center gap-xs">
-          <span className="material-symbols-outlined text-[20px]">add</span>
+        <button onClick={() => setIsModalOpen(true)} className="bg-primary-container text-on-primary font-label-bold text-[12px] px-md py-sm uppercase hover:brightness-110 active:scale-95 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] flex items-center justify-center gap-xs">
+          <span className="material-symbols-outlined text-[18px]">add</span>
           New Lead
         </button>
       </div>
