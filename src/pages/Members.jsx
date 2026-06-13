@@ -585,23 +585,23 @@ export default function Members() {
                     {/* Phone */}
                     <td className="py-sm px-md font-body-md text-[12px] text-on-surface/50 hidden md:table-cell">{member.phone}</td>
                     {/* Branch */}
-                    <td className="py-sm px-md hidden lg:table-cell">
+                    <td className="py-sm px-md hidden lg:table-cell whitespace-nowrap">
                       <span className="font-body-md text-[12px] text-on-surface/50">{member.branchName}</span>
                     </td>
                     {/* Plan */}
-                    <td className="py-sm px-md hidden md:table-cell">
-                      <span className="border border-white/10 px-sm py-[3px] font-label-bold text-[9px] uppercase text-on-surface/60 group-hover:border-primary-container/30 group-hover:text-primary-container transition-colors">
+                    <td className="py-sm px-md hidden md:table-cell whitespace-nowrap">
+                      <span className="border border-white/10 px-sm py-[3px] font-label-bold text-[9px] uppercase text-on-surface/60 group-hover:border-primary-container/30 group-hover:text-primary-container transition-colors whitespace-nowrap inline-block">
                         {member.planName}
                       </span>
                     </td>
                     {/* Trainer */}
-                    <td className="py-sm px-md hidden lg:table-cell">
+                    <td className="py-sm px-md hidden lg:table-cell whitespace-nowrap">
                       <span className="font-body-md text-[12px] text-on-surface/50">{member.trainer}</span>
                     </td>
                     {/* Joined */}
-                    <td className="py-sm px-md font-body-md text-[12px] text-on-surface/35 hidden lg:table-cell">{member.joinDate}</td>
+                    <td className="py-sm px-md font-body-md text-[12px] text-on-surface/35 hidden lg:table-cell whitespace-nowrap">{member.joinDate}</td>
                     {/* Expiry */}
-                    <td className="py-sm px-md">
+                    <td className="py-sm px-md whitespace-nowrap">
                       <div>
                         <p className={`font-body-md text-[12px] ${member.status === 'Expired' ? 'text-error' : 'text-on-surface/50'}`}>
                           {member.expiryDate}
@@ -619,7 +619,7 @@ export default function Members() {
                       </div>
                     </td>
                     {/* Status */}
-                    <td className="py-sm px-md text-center">
+                    <td className="py-sm px-md text-center whitespace-nowrap">
                       <span className={`inline-flex items-center gap-[4px] px-sm py-[3px] font-label-bold text-[9px] uppercase ${
                         member.status === 'Active'
                           ? 'bg-green-500/10 text-green-500 border border-green-500/20'
