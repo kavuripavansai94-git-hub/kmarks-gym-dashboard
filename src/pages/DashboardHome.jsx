@@ -94,6 +94,7 @@ export default function DashboardHome() {
   const [activeToday, setActiveToday] = useState(0);
   const [overduePayments, setOverduePayments] = useState(0);
   const [expiringSoon, setExpiringSoon] = useState(0);
+  const [weeklyActivity, setWeeklyActivity] = useState([0,0,0,0,0,0,0]);
   
   const [recentMembers, setRecentMembers] = useState([]);
   const [allPayments, setAllPayments] = useState([]);
@@ -151,16 +152,7 @@ export default function DashboardHome() {
     return "Active";
   };
 
-  // Generate mock weekly data from real counts
-  const generateWeekData = (current) => {
-    const data = [];
-    for (let i = 6; i >= 0; i--) {
-      const variance = Math.max(0, current + Math.floor(Math.random() * 6) - 3);
-      data.push(variance);
-    }
-    data[6] = current;
-    return data;
-  };
+  // Weekly Activity is now fetched from the backend
   
   const formatDate = (dateStr) => {
     if (!dateStr || dateStr === 'N/A') return 'N/A';
@@ -200,7 +192,7 @@ export default function DashboardHome() {
     setLoading(true);
     setError(null);
     try {
-      const [membersRes, attendanceRes, recentRes, trainersRes, allPayRes, allAttRes, plansRes] = await Promise.all([
+      const [membersRes, attendanceRes, recentRes, trainersRes, allPayRes, allAttRes, plansRes, weeklyStatsRes] = await Promise.all([
         api.get('/api/members'),
         api.get('/api/attendance?date=today'),
         api.get('/api/members?limit=5'),
@@ -210,6 +202,10 @@ export default function DashboardHome() {
         api.get('/api/plans').catch(err => {
           console.warn('Could not fetch plans:', err);
           return { data: { plans: [] } };
+        }),
+        api.get('/api/attendance/weekly-stats').catch(err => {
+          console.warn('Could not fetch weekly stats:', err);
+          return { data: { weeklyStats: [0,0,0,0,0,0,0] } };
         })
       ]);
 
@@ -231,6 +227,7 @@ export default function DashboardHome() {
       setActiveToday(aCount);
       setAllPayments(allPayRes.data.payments || []);
       setAllAttendance(allAttRes.data.attendance || []);
+      setWeeklyActivity(weeklyStatsRes.data.weeklyStats || [0,0,0,0,0,0,0]);
 
       // Filter: Expiring Soon
       const today = new Date(); today.setHours(0,0,0,0);
@@ -319,8 +316,6 @@ export default function DashboardHome() {
   }
 
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const memberWeekData = generateWeekData(totalMembers);
-  const attendanceWeekData = generateWeekData(activeToday);
 
   return (
     <div className="space-y-md lg:space-y-lg relative">
@@ -556,7 +551,7 @@ export default function DashboardHome() {
               </div>
               <div className="grid grid-cols-7 gap-sm">
                 {weekDays.map((day, i) => {
-                  const value = attendanceWeekData[i] || 0;
+                  const value = weeklyActivity[i] || 0;
                   const intensity = Math.min(value / Math.max(activeToday || 1, 1), 1);
                   return (
                     <div key={day} className="flex flex-col items-center gap-xs">
